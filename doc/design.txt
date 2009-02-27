@@ -1,0 +1,61 @@
+Since I don't recall the original code, there's some further reading below to help 'explain' the text further.
+
+* Direction Markers.
+=========================
+
+(i.e. Right = 1 | Left = 2 | Up = 4 | Down = 8
+    DiagUpLeft = 16 | DiagUpRight = 32 | 
+    DiagDwnLeft = 64  | DiagDwnRight = 128 )
+    
+Use of 8 bit representation for directions allows for bitwise mathematics for resolving direction. A bit of hard work up front for simplified (?) coding afterwards ?
+
+I also foresee that the bitwise choice should making developing a GUI front end much simpler (at least the direction choice mechanism.)
+
+* Default Values
+=========================
+Direction & Grid Size
+
+Seems like choosing a sane default is simpler than forcing the user to make the selection every time.
+
+* Variables
+=========================
+
+grid_optimal - a strange 'optimal' # of unfilled cells, such that the code shouldn't bother with trying to fill it any further
+
+(e.g. 1 in 100 cells is allowed to be empty)
+
+grid_available - tracks number of cells not yet
+filled in the grid/matrix
+
+* Classes
+============
+
+Options
+    - Get Options from:
+        a. command-line
+        b. defaults in a config file (optional)
+        c. write accepted config (optional)
+    
+StreamIO
+    - Load wordlist from:
+        a. file
+        b. user-interface (gui)
+    
+Sanitiser
+    - Sanitise wordlist
+        a. acceptable characters (eng, to)
+        b. suck down Unicode character table (optional)
+
+WSMatrix_Init
+    - Initialise Matrix for the Wordsearch puzzle
+    - gives flexibility for customised grid layouts
+    other than the default rectangle shapes
+    
+WSMatrix_Populate
+    - Place wordlist into a matrix
+    
+WSMatrix_Display
+    - Display WordSearch matrix
+    
+WSMatrix_Solver
+    - Interactive solution with user
