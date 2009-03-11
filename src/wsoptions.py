@@ -6,7 +6,7 @@
 # see LICENSE.TXT for license/copyright information
 import optparse, sys
 
-class Options:
+class WSoptions:
     def __init__(self):
         
         self.x = 20

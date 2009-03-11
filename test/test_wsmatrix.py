@@ -35,7 +35,7 @@ class u_WSmatrix(libpry.AutoTree):
         test = WSmatrix()
         maxx=30
         maxy=25
-        matrix, available, minleftover = test.cells_init(maxx,maxy)
+        matrix, available, minleftover = test.init_cells(maxx,maxy)
         assert len(matrix) == maxx
         assert len(matrix[0]) == maxy
         assert available == (maxx * maxy)
@@ -53,16 +53,91 @@ class u_WSmatrix(libpry.AutoTree):
             #~ print"- "* (i-2)
         
     def test_startGrid(self):
-        test = WSmatrix()
-        
-        
+        directions = WSdirections()
+        test = WSmatrix((10,10),directions.Right | directions.Left,self.words)
+        matrix = test.startGrid(directions.Right, 10)
+        assert len(matrix) == 10
+        matrix = test.startGrid(directions.Down, 10)
+        assert len(matrix) == 10
+        matrix = test.startGrid(directions.Right,9)
+        assert len(matrix) == 20
+        matrix = test.startGrid(directions.DiagDwnRight,10)
+        assert len(matrix) == 1
     def test_insertWord(self):
         test = WSmatrix()
+    def test_canInsertWord(self):
+        words =['this','one','will','do']
+        directions = WSdirections()
+        test = WSmatrix((11,11),directions.Right | directions.Left,words)
+        for word in words:
+            answer = test.canInsertWord(word, (0,0), directions.Right, test.matrix)
+            assert answer == True
+        assert test.canInsertWord('this is a very long word not to fit in grid', (0,0), directions.Right, test.matrix) == False
+
+    #~ def test_insertWord(self):
+        #~ words =['this','one','will','do','nicely', 'fine', 'thankyou','seriouslybroken']
+        #~ directions = WSdirections()
+        #~ test = WSmatrix((5,9),directions.Right | directions.Left,words)
+        #~ matrix = test.matrix
+        #~ assert test.canInsertWord(words[0], (0,0), directions.Right,matrix) == True
+        #~ matrix = test.insertWord(words,(0,0), directions.Right, matrix, True)
+        #~ assert test.canInsertWord(words[1:][0], (0,0), directions.Right,matrix) == False
+        #~ assert test.canInsertWord(words[1:][0], (1,0), directions.Right,matrix) == True
+        #~ matrix = test.insertWord(words[1:],(1,0), directions.Right, matrix, True)
+        #~ assert test.canInsertWord(words[2], (2,0), directions.Right,matrix) == True
+        #~ matrix = test.insertWord(words[2:],(2,0), directions.Right, matrix, True)
+        #~ assert test.canInsertWord(words[3], (3,0), directions.Right,matrix) == True
+        #~ matrix = test.insertWord(words[3:],(3,0), directions.Right, matrix, True)
+        #~ assert test.canInsertWord(words[4], (4,0), directions.Right,matrix) == True
+        #~ matrix = test.insertWord(words[4:],(4,0), directions.Right, matrix, True)
+
+        #~ print 
+        #~ print "InsertWord"
+        #~ x = len(matrix)
+        #~ for i in range(x):
+            #~ print matrix[i]
+                
+        #~ print
         
     def test_populate(self):
-        test = WSmatrix((0,0))
+        words =['where','is','world','taking','us','spontaneously','this','one','will','do', 'just', 'fine', 'thankyou']
         directions = WSdirections()
-        assert len(test.startGrid(directions.Right,11)) == 0
+        test = WSmatrix((11,11),directions.Right | directions.Left,words)
+        matrix, accepted, rejected = test.populate()
+        #~ print
+        #~ test.display(matrix)
+        assert rejected == []
+        #~ print accepted
+        #~ print rejected
+    
+    def test_populate_matrix(self):
+        words =['bitspaceX', 'this','one','will','do', 'just', 'fine', 'thankyou']
+        directions = WSdirections()
+        test = WSmatrix((5,9),directions.Right,words)
+        success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
+        #~ print
+        #~ test.display(matrix)
+        print
+        #~ print "words   : ", words
+        print "accepted: ", accepted, test.wordsplaced
+        #~ print "rejected: ", rejected, test.wordsrejected
+        #~ assert rejected == []
+        
+    def test_populate_matrix1(self):
+        words =['bitspace','extras']
+        directions = WSdirections()
+        test = WSmatrix((5,9),directions.Right,words)
+        success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
+        #~ print
+        #~ test.display(matrix)
+        #~ print "words   : ", words
+        #~ print "accepted: ", accepted, test.wordsplaced
+        #~ print "rejected: ", rejected, test.wordsrejected
+        assert rejected == []
+        
+    def test_cellNext(self):
+        pass
+        
         
 class u_WSdirections(libpry.AutoTree):
     def setUpAll(self):

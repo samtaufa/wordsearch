@@ -10,7 +10,6 @@ import random, string, copy
 from lang import to as language
 class WSmatrix():
     """
-       
         WS Matrix and management utilities
     """  
     def __init__(self, size=(20,20), directions = 1, wordlist = []):
@@ -24,8 +23,11 @@ class WSmatrix():
         self.INPUT_BLOCK = '#'
         self.cells_available = 0
         self.cells_minleftover = 0
-        self.wordsplaced = []
-        self.wordsrejected = []
+        self.wordsplaced = {}
+        self.wordsrejected = {}
+        self.rejectMax = 100
+        self.maxrow = 0
+        self.maxcol = 0
         
         self.maxrow, self.maxcol = size
         self.wsDir = WSdirections()
@@ -34,17 +36,16 @@ class WSmatrix():
         self.wordlist = wordlist
         
         self.matrix, self.cells_available, self.cells_minleftover = \
-            self.cells_init(self.maxrow, self.maxcol)
+            self.init_cells(self.maxrow, self.maxcol)
         self.startCells = []
         
     def set_directions(self, directions = 1):
         """
             :directions - integer concatenation of wsDirections.Directions
         """
-        self.wsDir.set_directions(directions)
-        self.directions = self.wsDir.Chosen
+        self.directions = self.wsDir.set_directions(directions)
         
-    def cells_init(self, rows=0, cols=0):
+    def init_cells(self, rows=0, cols=0):
         """
             Initialise matrix with INPUT_MASK
             :rows - # rows of matrix
@@ -75,7 +76,7 @@ class WSmatrix():
                 print matrix[xcell][ycell],
             print
             
-    def startGrid(self, direction, length):
+    def startGrid(self, direction, length, debug=False):
         """
             For a WSword of length and set with the direction
             return a list of vertices that can accommodate
@@ -92,98 +93,211 @@ class WSmatrix():
         
         #length -= 1
         if length > x_max and length > y_max:
+            if debug: print 'word is too long'
             return [] # word is too long
         
-        if length > x_max  and not (direction in [dir.Up,
+        if length > x_max  and (direction in [dir.Up,
                                                   dir.Down]):
+            print 'word is too long X'
             return [] # word is too long
         
-        if length > y_max and not (direction in [dir.Right,
+        if length > y_max and (direction in [dir.Right,
                                                  dir.Left]):
+            print 'word is too long Y'
             return [] # word is too long
         
+
+        # Columns
         if direction in [dir.Right, dir.DiagUpRight, dir.DiagDwnRight]:
-            x_min = 0
-            x_max = self.maxrow - length
+            y_max = self.maxcol - (length - 1)
             
-        if direction in [dir.Up, dir.Down]:
-            x_min = 0
-            x_max = self.maxrow
-        
         if direction in [dir.Left, dir.DiagUpLeft, dir.DiagDwnLeft]:
-            x_min = length
-            x_max = self.maxrow
-            
-        if direction in [dir.Right, dir.Left]:
-            y_min = 0
+            y_min = (length - 1)
             y_max = self.maxcol
-            
+
+        # Rows
         if direction in [dir.Down, dir.DiagDwnRight, dir.DiagDwnLeft]:
-            y_min = 0
-            y_max = self.maxcol - length
+            x_max = self.maxcol - (length - 1)
             
         if direction in [dir.Up, dir.DiagUpRight, dir.DiagUpLeft]:
-            y_min = length
-            y_max = self.maxcol
+            x_min = (length - 1)
+            x_max = self.maxrow
             
-        if x_min < 0 or y_min < 0 or x_max < 0 or y_max < 0:
+        if x_min < 0 or y_min < 0 or x_max < x_min or y_max < y_min:
+            if debug: print 'maths went wrong'
             return [] # shouldn't get here, but worth checking
             
+        if debug: print "X(%s -> %s) to Y(%s -> %s)" % (x_min, x_max, y_min, y_max)
         tempGrid =[]
-        for xc in range ( x_min, x_max ):
+        if x_min == x_max:
+            if debug: print "(%s, %s) X equal" % (x_min, x_max)
             for yc in range (y_min, y_max):
-                tempGrid.append ([xc, yc])
+                tempGrid.append ([x_min, yc])
+        else:
+            for xc in range ( x_min, x_max ):
+                if y_min == y_max:
+                    if debug: print "(%s, %s) Y equal" % (y_min, y_max)
+                    tempGrid.append([xc, y_min])
+                else:
+                    for yc in range (y_min, y_max):
+                        tempGrid.append ([xc, yc])
         
-        self.startCells = tempGrid
-    def popStartCells(self):
+        return tempGrid[:]
+
+    def populate_matrix(self, matrix, wordlist):
         """
-            Return a random start cell
+            Outer Looop:
+        """
+        if len(wordlist) == 0: # special case, recursion completed
+            return True, matrix, [], []
+        success = False
+        accepted = []
+        rejected = []
+        startPoint = (0,0)
+        dirGo = 0
+        
+        while 1: # Loop through all available words
+            if success or len(wordlist) == 0:
+                break
+            alldirections = self.directions[:]
+            #print
+            #print "%s " % wordlist[0],
+            while 1: # Loop through all available directions
+                if success or len(alldirections) == 0:
+                    break
+                dirGo =  alldirections.pop(random.randint(0, len(alldirections) -1 ))
+                #dirGo =  alldirections.pop(0)
+                subGrid = self.startGrid(dirGo, len(wordlist[0]))
+                #print " -> ", dirGo, "@ ", 
+                while 1: # Loop through all available Grid positions
+                    if success or len(subGrid) == 0:
+                        break
+                    startPoint = subGrid.pop( random.randint(0, len(subGrid)-1) )
+                    #startPoint = subGrid.pop(0)
+                    #print " (%s,%s)" % (startPoint[0], startPoint[1]),
+                    if self.canInsertWord(wordlist[0], startPoint, dirGo, matrix):
+                        # note it can be done for this word and do it
+                        success, matrix, accepted, rejected, cellValues = self.insertWord(wordlist, startPoint, dirGo, matrix)
+                        if not success:
+                            self.revertWord(wordlist[0], startPoint, dirGo, matrix, cellValues)
+
+            word = wordlist.pop(0)
+            if success: #
+                accepted.append( word )
+                if not word in self.wordsplaced:
+                    self.wordsplaced[ word ] = [0, startPoint, dirGo]
+                self.wordsplaced[ word ] = [self.wordsplaced[word][0] + 1, startPoint, dirGo ]
+            else:
+                rejected.append( word ) # word needs to be rejected
+                if not word in self.wordsrejected:
+                    self.wordsrejected[ word ] = 0
+                self.wordsrejected[ word ] += 1
+                #wordlist.append(wordlist[0])
+                if self.wordsrejected[ word ] > self.rejectMax:
+                    success = True
+        return success, matrix, accepted, rejected
+
+    def insertWord(self,wordList, startPos, direction, matrix, debug=False):
+        """
+            Recursively insert a word into the Matrix and
+            return success state
             
+            return: True/False
+            curr:   (x, y) current grid cell
+            word:   word to insert
+            direction: WSdirections.Direction to insert word
         """
-        item = random.randint(0, len(self.startCells) -1)
-        return self.startCells.pop(item)
-    def insertWord(self, wordStr, start, direction ):
-        pass
+        row, col = startPos
+        storeCellContent = ''
+        word = wordList[0]
+        for i in range(len(word)):
+            storeCellContent += matrix[row][col] 
+            matrix[row][col] = word[i]
+            row, col = self.cellNext((row,col), direction)
+        success, matrix, accepted, rejected = self.populate_matrix(matrix, wordList[1:])
+        return success, matrix, accepted, rejected, storeCellContent
     
-    def insertWordPart(self, wordstr, start, direction):
-        pass
-    
+    def revertWord(self, word, startPos, direction, matrix, storeCellContent):
+        row, col = startPos
+        for i in range(len(storeCellContent)):
+            matrix[row][col] = storeCellContent[i]
+            row, col = self.cellNext((row, col), direction)
+        
+    def canInsertWord(self, word, startPos, direction, matrix, debug=False):
+        if not self.lengthOK(len(word), startPos, direction):
+            if debug: print "Error: Word length too long"
+            return False
+        success = True
+        pos = startPos
+        for i in range(len(word)):
+            if not (matrix[pos[0]][pos[1]] == word[i] or
+                    matrix[pos[0]][pos[1]] == self.INPUT_MASK):
+                success = False
+                break
+            pos = self.cellNext(pos, direction)
+        return success
+    def lengthOK(self, length, startPos, direction):
+        row, col = startPos
+        if direction in [self.wsDir.Right, self.wsDir.DiagUpRight, self.wsDir.DiagDwnRight]:
+            col += (length - 1)
+        if direction in [self.wsDir.Left, self.wsDir.DiagDwnLeft, self.wsDir.DiagDwnRight]:
+            col -= (length - 1)
+            
+        # Movements in the Y plane (Note: Left and Right do not move)
+        if direction in [self.wsDir.DiagUpLeft, self.wsDir.Up, self.wsDir.DiagUpRight]:
+            row -= (length - 1)
+        elif direction in [self.wsDir.Down, self.wsDir.DiagDwnLeft, self.wsDir.DiagDwnRight]:
+            row += (length - 1)
+        
+        success = False
+        if 0 <= row <= self.maxrow and 0 <= col <= self.maxcol:
+            success = True
+        return success
     def populate(self):
         """
             Main Loop to insert document into Matrix Grid
         """
-        success = False
-        workinglist = self.wordlist
-        directions  = copy.deepcopy(self.direction)
+        workingList = self.wordlist[:]
+        workingMatrix = self.matrix[:]
         
-        while 1:
-            if success or len(workinglist) == 0:
-                break
-            dirGo = directions.pop()
-            item = random.randint(0, len(workinglist)-1)
-            word = workinglist.pop(item)
-            subGrid = self.startGrid(dirGo, len(word))
+        #while 1:  # Loop until timed out or success 'conditions' reached
+        success, workingMatrix, accepted, rejected = self.populate_matrix(workingMatrix, workingList)
+        # something's causing a fault
+        # grab the thorniest word, and drop it from workload
+        if self.cells_available <= self.cells_minleftover:
+            success = True                     
+        #elif some-condition:
+        #    self.wordsrejected.append( word )
+        return workingMatrix, accepted, rejected
             
-            while 1:
-                if success or len(subGrid) == 0:
-                    break
-                
-                startPoint = subGrid.pop( random.randint(0, len(subGrid)-1) )
-                success = insertWord(word, startPoint, dirGo, )
+    def cellNext(self, currPos, direction):
+        """
+            return: (x, y) Next cell in a given direction
+            curr:   (x, y) Current cell location
+            direction: WSdirections.Direction to move
+        """
+        row, col = currPos
+        # Movements in the X plane (Note: UP AND Down do not move)
+        if direction in [self.wsDir.Right, self.wsDir.DiagUpRight, self.wsDir.DiagDwnRight]:
+            col += 1
+        if direction in [self.wsDir.Left, self.wsDir.DiagDwnLeft, self.wsDir.DiagDwnRight]:
+            col -= 1
             
-            if self.cells_available <= self.cells_minleftover:
-                return True
-            
-            if success:
-                self.wordsplaced.append( word )
-            elif len(directions) == 0:
-                self.wordsrejected.append( word )
+        # Movements in the Y plane (Note: Left and Right do not move)
+        if direction in [self.wsDir.DiagUpLeft, self.wsDir.Up, self.wsDir.DiagUpRight]:
+            row -= 1
+        elif direction in [self.wsDir.Down, self.wsDir.DiagDwnLeft, self.wsDir.DiagDwnRight]:
+            row += 1
         
-        return success    
-    
+        #if not (0 <= row <= self.maxrow and 0 <= col <= self.maxcol):
+        #    raise 'Matrix Size Overflow (x,y) Max(%d,%d) Given (%d,%d) Calc(%d,%d) Direction:%d' \
+        #    %( self.maxrow, self.maxcol, currPos[0], currPos[1],
+        #      row, col, direction
+        #    )
+        return row, col
 class WSdirections():
     """
-        Utilities for managing WS directions
+        Utilities for management of WS directions
     """
     def __init__(self):
         self.Right = 1
@@ -204,16 +318,19 @@ class WSdirections():
             :combined an integer concatination of directions
         """
         self.Chosen = []
-        self.add(combined)
-        
+        self.Chosen = self.add(combined)
+        return self.Chosen
+    
     def add(self, combined = 0):
         """
             Verify and add combined to the Chosen directions list
             :combined an integer concatination of directions
         """
+        directions = self.Chosen
         for i in range(0, len(self.Directions)):
             if combined & self.Directions[i]:
-                self.Chosen.append(self.Directions[i])
+                directions.append(self.Directions[i])
+        return directions
 
     def pop(self):
         """
@@ -231,6 +348,9 @@ class WSdirections():
         
 
 class WSwords():
+    """
+        Utilities for managing WS words
+    """
     def __init__(self, wordlist = [], maxlength = 15):
         self.maxlength = maxlength
         self.wordlist = []

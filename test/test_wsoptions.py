@@ -1,18 +1,18 @@
 import libpry
-from src.options import Options
+from src.wsoptions import WSoptions
 from src.wsmatrix import WSdirections
 import sys
 
-class u_Options(libpry.AutoTree):
+class u_WSoptions(libpry.AutoTree):
     def setUpAll(self):
-        self.test = Options()
+        self.test = WSoptions()
         sys.argv = ['app.py', '-g','21','21', '-d', '1','test_options.py']        
         
     def tearDownAll(self):
         self.test = None
 
     def test_init(self):
-        self.test = Options()
+        self.test = WSoptions()
         assert self.test.x == 20
         assert self.test.y == 20
     
@@ -43,5 +43,5 @@ class u_Options(libpry.AutoTree):
         assert dir == 1
 
 tests = [
-    u_Options()
+    u_WSoptions()
 ]

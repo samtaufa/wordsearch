@@ -9,7 +9,7 @@ Since I don't recall the original code, there's some further reading below to he
     
 Use of 8 bit representation for directions allows for bitwise mathematics for resolving direction. A bit of hard work up front for simplified (?) coding afterwards ?
 
-I also foresee that the bitwise choice should making developing a GUI front end much simpler (at least the direction choice mechanism.)
+I guesstimate the bitwise choice should making developing a GUI front end much simpler (at least the direction choice mechanism.)
 
 * Default Values
 =========================
