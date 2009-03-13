@@ -403,5 +403,56 @@ class WSwords():
         for word in rejectedwords:
             self.wordlist_rejected.append(word)
             
+class WSdisplay():
+    def __init__(self, accepted =[], matrix=[], solution={}):
+        self.accepted = accepted
+        self.matrix = matrix
+        self.solution = solution
+
+    def unicode(self, accepted=[], matrix=[], solution=[]):
+        pass
+    
+    def html(self, accepted=[], matrix=[], solution={}):
+        myaccepted = self.html_accepted(accepted)
+        mymatrix = self.html_matrix(matrix)
+        mysolution = self.html_solution(solution)
+
+        return myaccepted, mymatrix, mysolution
+    
+    def html_solution(self, solution = {}):
+        if solution == {}:
+            solution = self.solution
+            
+        return mysolution
+    
+    def html_accepted(self, accepted = []):
+        if accepted == []:
+            accepted = self.accepted
+        
+        myaccepted = "<p>"
+        lines = len(accepted)
+        for word in range(lines):
+            myaccepted += "\n" + word + "<br />"
+        myaccepted = "</p>"
+        
+    def html_matrix(self, matrix = []):
+            
+        if matrix == []:
+            matrix = self.matrix
+        mymatrix = "<table class='wsmatrix'>"
+        
+        rows = len(matrix)
+        cols = len(matrix[0])
+        for row in range(rows):
+            mymatrix += "\n<tr>"
+            for col in range(cols):
+                mymatrix += "<td>" + matrix[row][col] + "</td>"
+            mymatrx += "</tr>"
+        mymatrix = "\n</table>"
+        return mymatrix
+    
+    def xml(self, accepted=[], matrix=[], solution=[]):
+        pass
+    
 if __name__ == '__main__':
     pass
