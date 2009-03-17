@@ -1,0 +1,5 @@
+# Python object files
+*.py[cd]
+MANIFEST
+/build
+/dist

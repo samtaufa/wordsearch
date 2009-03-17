@@ -1,5 +1,5 @@
 import libpry
-from src.wsmatrix import WSmatrix, WSdirections, WSwords
+from src.wsmatrix import WSmatrix, WSdirections, WStext, WSformats
 import sys
 
 class u_WSmatrix(libpry.AutoTree):
@@ -74,22 +74,19 @@ class u_WSmatrix(libpry.AutoTree):
             assert answer == True
         assert test.canInsertWord('this is a very long word not to fit in grid', (0,0), directions.Right, test.matrix) == False
 
-    #~ def test_insertWord(self):
-        #~ words =['this','one','will','do','nicely', 'fine', 'thankyou','seriouslybroken']
-        #~ directions = WSdirections()
-        #~ test = WSmatrix((5,9),directions.Right | directions.Left,words)
-        #~ matrix = test.matrix
-        #~ assert test.canInsertWord(words[0], (0,0), directions.Right,matrix) == True
-        #~ matrix = test.insertWord(words,(0,0), directions.Right, matrix, True)
-        #~ assert test.canInsertWord(words[1:][0], (0,0), directions.Right,matrix) == False
-        #~ assert test.canInsertWord(words[1:][0], (1,0), directions.Right,matrix) == True
-        #~ matrix = test.insertWord(words[1:],(1,0), directions.Right, matrix, True)
-        #~ assert test.canInsertWord(words[2], (2,0), directions.Right,matrix) == True
-        #~ matrix = test.insertWord(words[2:],(2,0), directions.Right, matrix, True)
-        #~ assert test.canInsertWord(words[3], (3,0), directions.Right,matrix) == True
-        #~ matrix = test.insertWord(words[3:],(3,0), directions.Right, matrix, True)
-        #~ assert test.canInsertWord(words[4], (4,0), directions.Right,matrix) == True
-        #~ matrix = test.insertWord(words[4:],(4,0), directions.Right, matrix, True)
+    def test_insertWord(self):
+        words =['this','one','will','do','nicely', 'fine', 'thankyou','seriouslybroken']
+        directions = WSdirections()
+        test = WSmatrix((5,9),directions.Right | directions.Left,words)
+        matrix = test.matrix
+        assert test.canInsertWord(words[0], (0,0), directions.Right,matrix) == True
+        
+        test.debug = False
+        assert test.canInsertWord(words[1:][0], (0,0), directions.Right,matrix) == True
+        assert test.canInsertWord(words[1:][0], (1,0), directions.Right,matrix) == True
+        assert test.canInsertWord(words[2], (2,0), directions.Right,matrix) == True
+        assert test.canInsertWord(words[3], (3,0), directions.Right,matrix) == True
+        assert test.canInsertWord(words[4], (4,0), directions.Right,matrix) == True
 
         #~ print 
         #~ print "InsertWord"
@@ -104,36 +101,37 @@ class u_WSmatrix(libpry.AutoTree):
         directions = WSdirections()
         test = WSmatrix((11,11),directions.Right | directions.Left,words)
         matrix, accepted, rejected = test.populate()
+        assert rejected == ['spontaneously']
         #~ print
         #~ test.display(matrix)
-        assert rejected == []
         #~ print accepted
         #~ print rejected
+        #~ print
     
     def test_populate_matrix(self):
         words =['bitspaceX', 'this','one','will','do', 'just', 'fine', 'thankyou']
         directions = WSdirections()
-        test = WSmatrix((5,9),directions.Right,words)
+        test = WSmatrix((10,10),directions.DiagDwnRight,words)
         success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
+        assert rejected == []
         #~ print
         #~ test.display(matrix)
-        print
+        #~ print
         #~ print "words   : ", words
-        print "accepted: ", accepted, test.wordsplaced
+        #~ print "accepted: ", test.wordsplaced
         #~ print "rejected: ", rejected, test.wordsrejected
-        #~ assert rejected == []
         
     def test_populate_matrix1(self):
         words =['bitspace','extras']
         directions = WSdirections()
-        test = WSmatrix((5,9),directions.Right,words)
+        test = WSmatrix((7,9),directions.DiagDwnLeft,words)
         success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
+        assert rejected == []
         #~ print
         #~ test.display(matrix)
         #~ print "words   : ", words
         #~ print "accepted: ", accepted, test.wordsplaced
         #~ print "rejected: ", rejected, test.wordsrejected
-        assert rejected == []
         
     def test_cellNext(self):
         pass
@@ -178,7 +176,7 @@ class u_WSdirections(libpry.AutoTree):
         test.append(128)
         assert test.Chosen == [1, 2, 4, 128]
 
-class u_WSwords(libpry.AutoTree):
+class u_WStext(libpry.AutoTree):
     def setUpAll(self):
         self.Twords = ["sam","is","not","in","the","house"]
 
@@ -192,20 +190,54 @@ class u_WSwords(libpry.AutoTree):
         wordlist = ["short", "notshorter", "longing", "verylongword"]
         expect   = ["short", "notshorter", "longing" ]
         expectlong= ["verylongword"]
-        test = WSwords(wordlist, 11)
+        test = WStext(wordlist, 11)
         assert test.wordlist == expect
         assert test.wordlist_rejected == expectlong
         
     def test_sanitize_content(self):
         wordlist =["short", "not6shorter", "longing","verylongword"]
         expect =  ["short", "not", "longing","verylongword"]
-        test = WSwords(wordlist)
+        test = WStext(wordlist)
         assert test.wordlist == expect
         assert test.wordlist_rejected == []
-
-    
+class u_WSformats(libpry.AutoTree):
+    def setUpAll(self):
+        words =['bitspaceX', 'this','one','will','do', 'just', 'fine', 'thankyou']
+        directions = WSdirections()
+        test = WSmatrix((5,9),directions.DiagDwnRight,words)
+        success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
+        self.format = WSformats()
+        self.format.matrix = matrix
+        self.format.accepted = accepted
+        self.format.rejected = rejected
+        self.format.solution = test.wordsplaced
+        
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+    def tearDownAll(self):
+        pass
+    def test_html(self):
+        myaccepted, mymatrix, mysolution = self.format.html()
+        #~ print myaccepted
+        #~ print mymatrix
+        #~ print mysolution
+    def test_unicode(self):
+        myaccepted, mymatrix, mysolution = self.format.unicode()
+        #~ print myaccepted
+        #~ print mymatrix
+        #~ print mysolution
+    def test_xml(self):
+        pass
+    def test_getLetter(self):
+        self.format.fillLetterBin()
+        #~ for i in range(0,10):
+            #~ print self.format.getLetter()," ",
+        #~ print
 tests = [
     u_WSmatrix(),
     u_WSdirections(),
-    u_WSwords()
+    u_WStext(),
+    u_WSformats()
 ]

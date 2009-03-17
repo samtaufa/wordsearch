@@ -7,50 +7,50 @@
 
 import libpry
 import sys
-from src.streamio import StreamIO
+from src.wsstreamio import WSstreamIO
 from src.directions import Directions
 
-class u_StreamIO(libpry.AutoTree):
+class u_WSstreamIO(libpry.AutoTree):
     def setUpAll(self):
         import os
-        self.filename = "test_streamio.py"
+        self.filename = "test_wsstreamio.py"
         
     def tearDownAll(self):
         pass
         
     def test_init1(self):
-        test = StreamIO()
+        test = WSstreamIO()
         assert test.words == []
         assert test.lines == []
         
     def test_init2(self):
-        test = StreamIO('test_streamio.py')
+        test = WSstreamIO('test_wsstreamio.py')
         assert test.words == []
         assert test.lines != []
         
     def test_open(self):
-        test = StreamIO()
+        test = WSstreamIO()
         fh = test.open(self.filename)
         assert file == type(fh)
         assert self.filename == fh.name
         
     def test_load(self):
-        test = StreamIO(self.filename)
+        test = WSstreamIO(self.filename)
         assert test.lines > 0
 
     def test_open(self):
-        test = StreamIO()
+        test = WSstreamIO()
         fh = test.open(self.filename)
         assert fh
         
     def test_load(self):
-        test = StreamIO()
+        test = WSstreamIO()
         fh = test.open(self.filename)
         lines = test.load(fh)
         assert lines
 
     def test_lines(self):
-        test = StreamIO(self.filename)
+        test = WSstreamIO(self.filename)
         assert test.lines
         
     
@@ -60,6 +60,6 @@ class u_StreamIO(libpry.AutoTree):
 
 
 tests = [
-    u_StreamIO()
+    u_WSstreamIO()
 ]
 

@@ -6,8 +6,8 @@
 # see LICENSE.TXT for license/copyright information
 #
 # 
-import random, string, copy
-from lang import to as language
+import random, string, copy, time
+
 class WSmatrix():
     """
         WS Matrix and management utilities
@@ -28,6 +28,7 @@ class WSmatrix():
         self.rejectMax = 100
         self.maxrow = 0
         self.maxcol = 0
+        self.maxruntime = 60.0
         
         self.maxrow, self.maxcol = size
         self.wsDir = WSdirections()
@@ -38,6 +39,10 @@ class WSmatrix():
         self.matrix, self.cells_available, self.cells_minleftover = \
             self.init_cells(self.maxrow, self.maxcol)
         self.startCells = []
+        
+        self.language = "to"
+        self.WStext = WStext()
+        self.debug = False
         
     def set_directions(self, directions = 1):
         """
@@ -76,7 +81,7 @@ class WSmatrix():
                 print matrix[xcell][ycell],
             print
             
-    def startGrid(self, direction, length, debug=False):
+    def startGrid(self, direction, length):
         """
             For a WSword of length and set with the direction
             return a list of vertices that can accommodate
@@ -93,17 +98,17 @@ class WSmatrix():
         
         #length -= 1
         if length > x_max and length > y_max:
-            if debug: print 'word is too long'
+            if self.debug: print 'word is too long'
             return [] # word is too long
         
         if length > x_max  and (direction in [dir.Up,
                                                   dir.Down]):
-            print 'word is too long X'
+            if self.debug: print 'word is too long X'
             return [] # word is too long
         
         if length > y_max and (direction in [dir.Right,
                                                  dir.Left]):
-            print 'word is too long Y'
+            if self.debug: print 'word is too long Y'
             return [] # word is too long
         
 
@@ -124,19 +129,19 @@ class WSmatrix():
             x_max = self.maxrow
             
         if x_min < 0 or y_min < 0 or x_max < x_min or y_max < y_min:
-            if debug: print 'maths went wrong'
+            if self.debug: print 'maths went wrong'
             return [] # shouldn't get here, but worth checking
             
-        if debug: print "X(%s -> %s) to Y(%s -> %s)" % (x_min, x_max, y_min, y_max)
+        if self.debug: print "X(%s -> %s) to Y(%s -> %s)" % (x_min, x_max, y_min, y_max)
         tempGrid =[]
         if x_min == x_max:
-            if debug: print "(%s, %s) X equal" % (x_min, x_max)
+            if self.debug: print "(%s, %s) X equal" % (x_min, x_max)
             for yc in range (y_min, y_max):
                 tempGrid.append ([x_min, yc])
         else:
             for xc in range ( x_min, x_max ):
                 if y_min == y_max:
-                    if debug: print "(%s, %s) Y equal" % (y_min, y_max)
+                    if self.debug: print "(%s, %s) Y equal" % (y_min, y_max)
                     tempGrid.append([xc, y_min])
                 else:
                     for yc in range (y_min, y_max):
@@ -160,21 +165,21 @@ class WSmatrix():
             if success or len(wordlist) == 0:
                 break
             alldirections = self.directions[:]
-            #print
-            #print "%s " % wordlist[0],
+            if self.debug: print
+            if self.debug: print "%s " % wordlist[0],
             while 1: # Loop through all available directions
                 if success or len(alldirections) == 0:
                     break
                 dirGo =  alldirections.pop(random.randint(0, len(alldirections) -1 ))
                 #dirGo =  alldirections.pop(0)
                 subGrid = self.startGrid(dirGo, len(wordlist[0]))
-                #print " -> ", dirGo, "@ ", 
+                if self.debug: print " -> ", dirGo, "@ ", 
                 while 1: # Loop through all available Grid positions
                     if success or len(subGrid) == 0:
                         break
                     startPoint = subGrid.pop( random.randint(0, len(subGrid)-1) )
                     #startPoint = subGrid.pop(0)
-                    #print " (%s,%s)" % (startPoint[0], startPoint[1]),
+                    if self.debug: print " (%s,%s)" % (startPoint[0], startPoint[1]),
                     if self.canInsertWord(wordlist[0], startPoint, dirGo, matrix):
                         # note it can be done for this word and do it
                         success, matrix, accepted, rejected, cellValues = self.insertWord(wordlist, startPoint, dirGo, matrix)
@@ -197,7 +202,42 @@ class WSmatrix():
                     success = True
         return success, matrix, accepted, rejected
 
-    def insertWord(self,wordList, startPos, direction, matrix, debug=False):
+    def populate(self):
+        """
+            Main Loop to insert document into Matrix Grid
+        """
+        maxruntime = time.time() + self.maxruntime
+        
+        
+        workingList = self.wordlist[:]
+        workingMatrix = self.matrix[:]
+        
+        longest = max (self.maxcol, self.maxrow)
+        workingList, rejected = self.WStext.sanitize_words(workingList, longest)
+        success = False
+        rejected2 = []
+        while 1:  # Loop until timed out or success 'conditions' reached
+            if success or time.time() >= maxruntime or len(workingList) == 0:
+                break
+            success, workingMatrix, accepted, rejected2 = self.populate_matrix(workingMatrix, workingList)
+            
+            #if self.cells_available <= self.cells_minleftover:
+            #    success = True 
+            if not success:
+                tmp_word = ''
+                tmp_cnt = 0
+                for word in rejected2:
+                    if rejected2[word] > tmp_cnt:
+                        tmp_word = word
+                if tmp_cnt > 0:
+                    rejected += [tmp_word]
+                    workingList.pop(workingList.index(tmp_word))
+
+        if rejected2 != []:
+            rejected += rejected2
+        return workingMatrix, accepted, rejected
+            
+    def insertWord(self,wordList, startPos, direction, matrix):
         """
             Recursively insert a word into the Matrix and
             return success state
@@ -223,15 +263,15 @@ class WSmatrix():
             matrix[row][col] = storeCellContent[i]
             row, col = self.cellNext((row, col), direction)
         
-    def canInsertWord(self, word, startPos, direction, matrix, debug=False):
+    def canInsertWord(self, word, startPos, direction, matrix):
         if not self.lengthOK(len(word), startPos, direction):
-            if debug: print "Error: Word length too long"
+            if self.debug: print "Error: Word length too long"
             return False
         success = True
         pos = startPos
         for i in range(len(word)):
-            if not (matrix[pos[0]][pos[1]] == word[i] or
-                    matrix[pos[0]][pos[1]] == self.INPUT_MASK):
+            if not (matrix[pos[0]][pos[1]] == self.INPUT_MASK or
+                    matrix[pos[0]][pos[1]] == word[i]):
                 success = False
                 break
             pos = self.cellNext(pos, direction)
@@ -250,26 +290,9 @@ class WSmatrix():
             row += (length - 1)
         
         success = False
-        if 0 <= row <= self.maxrow and 0 <= col <= self.maxcol:
+        if 0 <= row <= (self.maxrow - 1) and 0 <= col <= ( self.maxcol - 1 ):
             success = True
         return success
-    def populate(self):
-        """
-            Main Loop to insert document into Matrix Grid
-        """
-        workingList = self.wordlist[:]
-        workingMatrix = self.matrix[:]
-        
-        #while 1:  # Loop until timed out or success 'conditions' reached
-        success, workingMatrix, accepted, rejected = self.populate_matrix(workingMatrix, workingList)
-        # something's causing a fault
-        # grab the thorniest word, and drop it from workload
-        if self.cells_available <= self.cells_minleftover:
-            success = True                     
-        #elif some-condition:
-        #    self.wordsrejected.append( word )
-        return workingMatrix, accepted, rejected
-            
     def cellNext(self, currPos, direction):
         """
             return: (x, y) Next cell in a given direction
@@ -347,22 +370,36 @@ class WSdirections():
         self.add(item)
         
 
-class WSwords():
+class WStext():
     """
-        Utilities for managing WS words
+        Utilities for managing WS wordlists
     """
-    def __init__(self, wordlist = [], maxlength = 15):
+    def __init__(self, wordlist = [], maxlength = 1000, lingua = "to"):
         self.maxlength = maxlength
         self.wordlist = []
         self.wordlist_rejected = []
-        self.wordlist, self.wordlist_rejected = self.sanitize(wordlist, maxlength)
+        self.language = self.setLanguage( lingua )
+        self.wordlist, self.wordlist_rejected = self.sanitize_words(wordlist, maxlength)
         
-    def sanitize(self, wordlist = [], maxlength = 0):
-        """
-            Sanitise the Wordlist by building a list of acceptable characters for a word
-            rejecting 
-        """
+    def setLanguage(self, lingua):
+        
+        if lingua == "eng" or lingua[0:1] == "en":
+            from lang import en as language
+        elif lingua == "local":
+            from lang import Language as language
+        else:
+            from lang import to as language
+            
         lang = language()
+        return lang
+    
+    def sanitize_words(self, wordlist = [], maxlength = 0):
+        """
+            Sanitise the Wordlist by building a list of
+            acceptable characters for a word
+            
+            return: goodwords, rejectedwords
+        """
         
         if wordlist == []:
             wordlist = self.wordlist        
@@ -376,7 +413,7 @@ class WSwords():
         for word in wordlist:
             if len(word) == 0:
                 continue
-            word = lang.w_Tokens(word)[0]            
+            word = self.language.w_Tokens(word)[0]            
             if len(word) > maxlength:
                 rejects.append(word)
             else:
@@ -386,73 +423,192 @@ class WSwords():
 
     def pop(self):
         """
-            Return a random item from WSwords.wordlist
+            Return a random item from WStext.wordlist
         """
         item = random.randint(0, len(self.wordlist) -1)
         return self.wordlist.pop(item)
     def append(self, wordlist):
         """
-            Append a word to WSwords.wordlist
+            Append a word to WStext.wordlist
         """
         if type(wordlist) == type(''):
             wordlist = [wordlist]
-        goodwords, rejectedwords = self.sanitize(wordlist)
+        goodwords, rejectedwords = self.sanitize_words(wordlist)
         
         for word in goodwords:
             self.wordlist.append(word)
         for word in rejectedwords:
             self.wordlist_rejected.append(word)
             
-class WSdisplay():
-    def __init__(self, accepted =[], matrix=[], solution={}):
+class WSformats():
+    def __init__(self, accepted =[], matrix=[], solution={}, rejected = []):
         self.accepted = accepted
         self.matrix = matrix
+        self.rejected = rejected
         self.solution = solution
+        self.letterBin = ""
+        
+        if accepted != []:
+            self.fillLetterBin()
 
-    def unicode(self, accepted=[], matrix=[], solution=[]):
-        pass
+        wsmatrix = WSmatrix()
+        self.INPUT_MASK = wsmatrix.INPUT_MASK
+        self.INPUT_BLOCK = wsmatrix.INPUT_BLOCK
+        
+    def textDirection(self, direction):
+        if direction == 1:
+            return "Right"
+        elif direction == 2:
+            return "Left"
+        elif direction == 4:
+            return "Up"
+        elif direction == 8:
+            return "Down"
+        elif direction == 16:
+            return "Diagonal Up Left"
+        elif direction == 32:
+            return "Diagonal Up Right"
+        elif direction == 64:
+            return "Diagonal Down Left"
+        elif direction == 128:
+            return "Diagonal Down Right"
+        
+        return "ERROR"
     
+    def fillLetterBin(self, accepted = []):
+        if accepted == []:
+            accepted = self.accepted        
+        
+        all_letters = ""
+        for line in accepted:
+            all_letters += line
+        
+        self.letterBin = all_letters
+        
+    def getLetter(self):
+        x = len (self.letterBin)
+        if x > 0:
+            return self.letterBin[random.randint(0, x - 1)]
+        return INPUT_MASK
+ 
     def html(self, accepted=[], matrix=[], solution={}):
+        if accepted == []:
+            accepted = self.accepted        
+        if matrix == []:
+            matrix = self.matrix
+        if solution == {}:
+            solution = self.solution
+        
+        accepted.sort()
+        self.fillLetterBin()
         myaccepted = self.html_accepted(accepted)
         mymatrix = self.html_matrix(matrix)
-        mysolution = self.html_solution(solution)
+        mysolution = self.html_solution(matrix, accepted, solution)
 
         return myaccepted, mymatrix, mysolution
     
-    def html_solution(self, solution = {}):
-        if solution == {}:
-            solution = self.solution
-            
+    def html_solution(self, matrix, accepted, solution):
+        
+        keys = solution.keys()
+        keys.sort()
+        mysolution ="<table class='wssolution'>"
+        mysolution += "\n  <tr><th>Word</th><th>Start @</th><th>Direction</th></tr>"
+        for word in keys:
+            if word in accepted:
+                mysolution += "\n  <tr><td>%s</td><td>(%s,%s)</td><td>%s</td></tr>" % (
+                    word,
+                    solution[word][1][0] + 1, solution[word][1][1] + 1,
+                    self.textDirection(solution[word][2]))
+        mysolution += "\n</table>"
+        mysolution += "\n\n"
+        mysolution += self.html_matrix(matrix,False)
+        
         return mysolution
     
-    def html_accepted(self, accepted = []):
-        if accepted == []:
-            accepted = self.accepted
+    def html_accepted(self, accepted = []):        
+        myaccepted = "<table class='WStext'>"
+        for word in accepted:
+            myaccepted += "\n  <tr><td>" + str(word) + "</td></tr>"
+        myaccepted += "\n</table>"
+        return myaccepted
         
-        myaccepted = "<p>"
-        lines = len(accepted)
-        for word in range(lines):
-            myaccepted += "\n" + word + "<br />"
-        myaccepted = "</p>"
-        
-    def html_matrix(self, matrix = []):
-            
-        if matrix == []:
-            matrix = self.matrix
-        mymatrix = "<table class='wsmatrix'>"
-        
+    def html_matrix(self, matrix = [], obfuscate = True):        
         rows = len(matrix)
         cols = len(matrix[0])
+        mymatrix = "<table class='wsmatrix'>"
+        
         for row in range(rows):
-            mymatrix += "\n<tr>"
+            mymatrix += "\n    <tr>"
             for col in range(cols):
-                mymatrix += "<td>" + matrix[row][col] + "</td>"
-            mymatrx += "</tr>"
-        mymatrix = "\n</table>"
+                cellvalue = matrix[row][col]
+                if cellvalue[0] == self.INPUT_MASK and obfuscate:
+                    cellvalue = self.getLetter()
+                    
+                mymatrix += "<td>" + cellvalue + "</td>"
+            mymatrix += "</tr>"
+        mymatrix += "\n</table>"
         return mymatrix
     
     def xml(self, accepted=[], matrix=[], solution=[]):
         pass
+    def unicode(self, accepted=[], matrix=[], solution={}):
+        if accepted == []:
+            accepted = self.accepted        
+        if matrix == []:
+            matrix = self.matrix
+        if solution == {}:
+            solution = self.solution
+        
+        accepted.sort()
+        self.fillLetterBin()
+        myaccepted = self.unicode_accepted(accepted)
+        mymatrix = self.unicode_matrix(matrix)
+        mysolution = self.unicode_solution(matrix, accepted, solution)
+
+        return myaccepted, mymatrix, mysolution
+    
+    def unicode_solution(self, matrix, accepted, solution):
+        
+        keys = solution.keys()
+        keys.sort()
+        mysolution =""
+        mysolution += "\nWord\tStart @\tDirection"
+        for word in keys:
+            if word in accepted:
+                mysolution += "\n  %s\t(%s,%s)\t%s" % (
+                    word,
+                    solution[word][1][0] + 1, solution[word][1][1] + 1,
+                    self.textDirection(solution[word][2]))
+        mysolution += "\n"
+        mysolution += "\n\n"
+        mysolution += self.unicode_matrix(matrix,False)
+        
+        return mysolution
+    
+    def unicode_accepted(self, accepted = []):        
+        myaccepted = ""
+        for word in accepted:
+            myaccepted += "\n  %s" % str(word)
+        myaccepted += "\n"
+        return myaccepted
+        
+    def unicode_matrix(self, matrix = [], obfuscate = True):        
+        rows = len(matrix)
+        cols = len(matrix[0])
+        mymatrix = ""
+        
+        for row in range(rows):
+            mymatrix += "\n    "
+            for col in range(cols):
+                cellvalue = matrix[row][col]
+                if cellvalue[0] == self.INPUT_MASK and obfuscate:
+                    cellvalue = self.getLetter()
+                    
+                mymatrix += "%s " % cellvalue
+            mymatrix += ""
+        mymatrix += "\n"
+        return mymatrix
+    
     
 if __name__ == '__main__':
     pass

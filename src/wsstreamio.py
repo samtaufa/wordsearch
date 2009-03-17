@@ -8,7 +8,7 @@
 
 import os.path
 
-class StreamIO:
+class WSstreamIO:
     def __init__(self, filename = ""):
         self.words = []
         self.lines = []
