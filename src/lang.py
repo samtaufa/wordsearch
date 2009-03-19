@@ -68,7 +68,7 @@ class Language:
         return myletters
     
     def w_validFirst( self, letter):
-        pass # 1st letter rules (e.g. do we allow numbers ?)
+        return True # Any unique rules for first characters in a word?
     def w_Tokens(self, line = None):
         if line is None:
             line = self.list_words
@@ -91,6 +91,8 @@ class Language:
                     if iCurr > iTokenStart:
                         if line[iCurr+1] in self.charSet:
                             line = line[0:iCurr] + self.glottals_to + line[iCurr+1:]
+                    else:
+                        iTokenStart = iCurr + 1
             else:                
                 if iCurr == iTokenStart: # We're still at the start
                     iTokenStart += 1     # Ignore the error and start with the next letter
@@ -110,6 +112,39 @@ class to(Language):
         self.c_addCharacters(self.glottals_all) # Compromise for mis-typed documents
         self.c_addCharacters(string.letters) # Compromise for non-Tongan words        
     def initCharSet(self):
+        self.voweldiacritics = (
+            unicodedata.lookup('LATIN CAPITAL LETTER A WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER E WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER I WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER O WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER U WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER A WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER E WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER I WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER O WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER U WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER A WITH ACUTE') +
+            unicodedata.lookup('LATIN CAPITAL LETTER E WITH ACUTE') +
+            unicodedata.lookup('LATIN CAPITAL LETTER I WITH ACUTE') +
+            unicodedata.lookup('LATIN CAPITAL LETTER O WITH ACUTE') +
+            unicodedata.lookup('LATIN CAPITAL LETTER U WITH ACUTE') +
+            unicodedata.lookup('LATIN SMALL LETTER A WITH ACUTE') +
+            unicodedata.lookup('LATIN SMALL LETTER E WITH ACUTE') +
+            unicodedata.lookup('LATIN SMALL LETTER I WITH ACUTE') +
+            unicodedata.lookup('LATIN SMALL LETTER O WITH ACUTE') +
+            unicodedata.lookup('LATIN SMALL LETTER U WITH ACUTE')
+            ) + (
+            unicodedata.lookup('LATIN CAPITAL LETTER A WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER E WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER I WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER O WITH MACRON') +
+            unicodedata.lookup('LATIN CAPITAL LETTER U WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER A WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER E WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER I WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER O WITH MACRON') +
+            unicodedata.lookup('LATIN SMALL LETTER U WITH MACRON')
+            )
         self.validVowels = (
             unicodedata.lookup('LATIN SMALL LETTER A') +
             unicodedata.lookup('LATIN SMALL LETTER E') +
@@ -120,7 +155,8 @@ class to(Language):
             unicodedata.lookup('LATIN CAPITAL LETTER E') +
             unicodedata.lookup('LATIN CAPITAL LETTER I') +
             unicodedata.lookup('LATIN CAPITAL LETTER O') +
-            unicodedata.lookup('LATIN CAPITAL LETTER U')
+            unicodedata.lookup('LATIN CAPITAL LETTER U') +
+            self.voweldiacritics
         )
         self.validConsonants = (
             unicodedata.lookup('LATIN SMALL LETTER F') +
@@ -146,9 +182,12 @@ class to(Language):
             unicodedata.lookup('LATIN CAPITAL LETTER T') +
             unicodedata.lookup('LATIN CAPITAL LETTER V') 
         )
-        self.charSet = ( self.validConsonants + self.validVowels +
-            unicodedata.lookup('FULL STOP') +
-            unicodedata.lookup('MODIFIER LETTER TURNED COMMA')
+        self.glottals_to  = unicodedata.lookup('MODIFIER LETTER TURNED COMMA')
+            # unicodedata.lookup('LEFTER SINGLE QUOTATION MARK') # when character not available
+
+        self.charSet = (
+            self.validConsonants + self.validVowels + self.glottals_to +
+            unicodedata.lookup('FULL STOP')
         )
     def initGlottals(self):
         self.glottals_all = (unicodedata.lookup('APOSTROPHE') +
@@ -168,8 +207,6 @@ class to(Language):
                              unicodedata.lookup('LATIN LETTER GLOTTAL STOP') +
                              unicodedata.lookup('LATIN CAPITAL LETTER GLOTTAL STOP')
                              )
-        self.glottals_to  = unicodedata.lookup('MODIFIER LETTER TURNED COMMA')
-            # unicodedata.lookup('LEFTER SINGLE QUOTATION MARK') # when character not available
     
     def initCharSetExt(self):
         """Diacritical mark: a mark placed over, under, alongside or
@@ -273,6 +310,8 @@ class to(Language):
 
 
     
+    def w_validFirst( self, letter):
+        return True #
     def w_Tokens(self, line = None):
         if line is None:
             line = self.list_words
@@ -291,24 +330,23 @@ class to(Language):
                 if iCurr == iMax-1: # last letter special exception
                     Tokens.append(line[iTokenStart:iMax])
                 elif letter in self.glottals_all:
-                    # transform glottal if inside a word and next letter is a vowel
-                    if iCurr > iTokenStart:
-                        if line[iCurr+1] in self.validVowels:
+                    if line[iCurr+1] in self.validVowels:
+                        if iCurr > iTokenStart or letter in ["'"]:
                             line = line[0:iCurr] + self.glottals_to + line[iCurr+1:]
-                        #else:
-                        #    Tokens.append(line[iTokenStart:iCurr])
-                        #    iTokenStart = iCurr + 1                            
-            else:                
-                if iCurr == iTokenStart: # We're still at the start
-                    iTokenStart += 1     # Ignore the error and start with the next letter
-                else:
-                    if ( letter in self.glottals_all and
-                         iCurr < iMax - 1 and line[iCurr + 1] in self.charSet
-                       ):
-                        line = line.replace(line[0:iCurr+1],line[0:iCurr]+self.glottals_to,1)
-                    else: # Word-boundary - grab the word prior to this location 
-                        Tokens.append(line[iTokenStart:iCurr])
+                    elif iCurr == iTokenStart:
                         iTokenStart = iCurr + 1
+                        #    Tokens.append(line[iTokenStart:iCurr])
+                        #    iTokenStart = iCurr + 1
+            else:                
+                if ( letter in self.glottals_all and
+                     iCurr < iMax - 1 and line[iCurr + 1] in self.validVowels
+                   ):
+                    line = line.replace(line[0:iCurr+1],line[0:iCurr]+self.glottals_to,1)
+                elif iCurr == iTokenStart: # We're still at the start
+                    iTokenStart += 1     # Ignore the error and start with the next letter
+                else: # Word-boundary - grab the word prior to this location 
+                    Tokens.append(line[iTokenStart:iCurr])
+                    iTokenStart = iCurr + 1
             iPrev = iCurr
         return Tokens
     

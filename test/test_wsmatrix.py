@@ -111,7 +111,7 @@ class u_WSmatrix(libpry.AutoTree):
     def test_populate_matrix(self):
         words =['bitspaceX', 'this','one','will','do', 'just', 'fine', 'thankyou']
         directions = WSdirections()
-        test = WSmatrix((10,10),directions.DiagDwnRight,words)
+        test = WSmatrix((10,10),directions.DiagDwnRight | directions.Right,words)
         success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
         assert rejected == []
         #~ print
