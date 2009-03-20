@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008, Samiuela Loni Vea Taufa
 # All rights reserved.
@@ -10,13 +10,13 @@ class Language:
     def __init__(self):
         self.charSet = ""
         self.charSetExt = ""
+        self.initGlottals()
         self.initCharSet()
         self.initCharSetExt()
-        self.initGlottals()
     def initCharSet(self):
         self.charSet = unicode(string.letters)
     def initCharSetExt(self):
-        pass
+        self.charSetExt = self.apostrophe
     def initGlottals(self):
         self.glottals_all = (unicodedata.lookup('APOSTROPHE') +
                              unicodedata.lookup('GRAVE ACCENT') +
@@ -35,7 +35,7 @@ class Language:
                              unicodedata.lookup('LATIN LETTER GLOTTAL STOP') +
                              unicodedata.lookup('LATIN CAPITAL LETTER GLOTTAL STOP')
                              )
-        self.glottals_to  = unicodedata.lookup('APOSTROPHE')
+        self.apostrophe  = unicodedata.lookup('APOSTROPHE')
     def c_allowNumerics( self, numerics = "" ):
         if numerics == "":
             numerics = string.digits
@@ -90,7 +90,10 @@ class Language:
                     # transform glottal if inside a word and next letter is a valid letter
                     if iCurr > iTokenStart:
                         if line[iCurr+1] in self.charSet:
-                            line = line[0:iCurr] + self.glottals_to + line[iCurr+1:]
+                            line = line[0:iCurr] + self.apostrophe + line[iCurr+1:]
+                        else:
+                            Tokens.append(line[iTokenStart:iCurr])
+                            iTokenStart = iCurr + 1
                     else:
                         iTokenStart = iCurr + 1
             else:                
@@ -335,7 +338,9 @@ class to(Language):
                             line = line[0:iCurr] + self.glottals_to + line[iCurr+1:]
                     elif iCurr == iTokenStart:
                         iTokenStart = iCurr + 1
-                        #    Tokens.append(line[iTokenStart:iCurr])
+                    else:
+                        Tokens.append(line[iTokenStart:iCurr])
+                        iTokenStart = iCurr + 1                        #    Tokens.append(line[iTokenStart:iCurr])
                         #    iTokenStart = iCurr + 1
             else:                
                 if ( letter in self.glottals_all and
