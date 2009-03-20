@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008, Samiuela Loni Vea Taufa
 # All rights reserved.
@@ -384,11 +384,11 @@ class WStext():
     def setLanguage(self, lingua):
         
         if lingua == "eng" or lingua[0:1] == "en":
-            from lang import en as language
+            from src.lang.lang import en as language
         elif lingua == "local":
-            from lang import Language as language
+            from src.lang.lang import Language as language
         else:
-            from lang import to as language
+            from src.lang.lang import to as language
             
         lang = language()
         return lang

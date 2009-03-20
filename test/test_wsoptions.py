@@ -1,6 +1,6 @@
 import libpry
-from src.wsoptions import WSoptions
-from src.wsmatrix import WSdirections
+from src.lib.wsoptions import WSoptions
+from src.lib.wsmatrix import WSdirections
 import sys
 
 class u_WSoptions(libpry.AutoTree):
@@ -13,8 +13,8 @@ class u_WSoptions(libpry.AutoTree):
 
     def test_init(self):
         self.test = WSoptions()
-        assert self.test.x == 20
-        assert self.test.y == 20
+        assert self.test.rows == 20
+        assert self.test.cols == 20
     
     def test_read_cmdline_options(self):      
         self.test.set_cmdline_defaults()

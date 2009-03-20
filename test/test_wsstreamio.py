@@ -7,8 +7,8 @@
 
 import libpry
 import sys
-from src.wsstreamio import WSstreamIO
-from src.directions import Directions
+from src.lib.wsstreamio import WSstreamIO
+from src.lib.directions import Directions
 
 class u_WSstreamIO(libpry.AutoTree):
     def setUpAll(self):

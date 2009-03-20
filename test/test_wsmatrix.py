@@ -1,5 +1,5 @@
 import libpry
-from src.wsmatrix import WSmatrix, WSdirections, WStext, WSformats
+from src.lib.wsmatrix import WSmatrix, WSdirections, WStext, WSformats
 import sys
 
 class u_WSmatrix(libpry.AutoTree):
