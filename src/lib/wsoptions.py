@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008, Samiuela Loni Vea Taufa
 # All rights reserved.
@@ -7,16 +7,14 @@
 import optparse, sys
 
 class WSoptions:
-    def __init__(self):
-        
-        self.x = 20
-        self.y = 20
+    def __init__(self):      
+        self.rows = 20
+        self.cols = 20
         self.usage = ""
         self.parser = optparse.OptionParser()
         self.version = "0.00.01"
         self.options = None
         self.args = None
-        
     def read_options_default(self):
         pass # Get it from a file?
     
@@ -52,8 +50,8 @@ class WSoptions:
 
     def get_gridsize(self):
         if len(self.options.grid_size) == 2:
-            self.x = self.options.grid_size[0]
-            self.y = self.options.grid_size[1]
+            self.rows = self.options.grid_size[0]
+            self.cols = self.options.grid_size[1]
         else:
             self.parser.print_help()
             sys.exit(2)
@@ -69,7 +67,7 @@ class WSoptions:
 
         self.get_gridsize()    
         
-        return self.args[0], self.x, self.y, self.options.directions
+        return self.args[0], self.rows, self.cols, self.options.directions
 
 if __name__ == '__main__':
     pass
