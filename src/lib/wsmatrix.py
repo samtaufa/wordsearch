@@ -380,19 +380,30 @@ class WStext():
         self.wordlist_rejected = []
         self.language = self.setLanguage( lingua )
         self.wordlist, self.wordlist_rejected = self.sanitize_words(wordlist, maxlength)
-        
+    def setWordlist(self, lines = []):
+        """set the wordlist from lines of text"""
+        self.wordlist = []
+        for line in lines:
+
+            tokens = self.language.w_Tokens(line.lower())
+            for token in tokens:
+                if not token in self.wordlist:
+                    self.wordlist.append(token)
+                    
+        self.wordlist, self.wordlist_rejected = self.sanitize_words(self.wordlist, self.maxlength)
     def setLanguage(self, lingua):
         
         if lingua == "eng" or lingua[0:1] == "en":
-            from src.lang.lang import en as language
+            from lang.lang import Language as language
         elif lingua == "local":
-            from src.lang.lang import Language as language
+            from lang.lang import Language as language
         else:
-            from src.lang.lang import to as language
+            from lang.to import to as language
             
         lang = language()
         return lang
     
+
     def sanitize_words(self, wordlist = [], maxlength = 0):
         """
             Sanitise the Wordlist by building a list of
