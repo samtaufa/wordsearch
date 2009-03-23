@@ -25,6 +25,7 @@ class WSstreamIO:
             fh = open( filename, 'rUb')
         except IOError:
             fh = None # File may not be readable
+            
         return fh
         
     def load(self, fh = None):
