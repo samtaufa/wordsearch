@@ -4,7 +4,7 @@
 # All rights reserved.
 #
 # see LICENSE.TXT for license/copyright information
-import optparse, sys
+import optparse, sys, os, os.path
 
 class WSoptions:
     def __init__(self):      
@@ -13,61 +13,59 @@ class WSoptions:
         self.usage = ""
         self.parser = optparse.OptionParser()
         self.version = "0.00.01"
-        self.options = None
+        self.directions = 1
         self.args = None
+        self.set_options()
     def read_options_default(self):
         pass # Get it from a file?
     
-    def set_cmdline_defaults(self):
+    def set_options(self):
         self.usage = """
-        usage: %prog [options] filename
+        usage: %prog [options] pathname
 
-        where filename is the text file containing words for the puzzle
+        where pathname is the file or directory
+        containing words for generating wordsearch
+        puzzle(s)
         """
         self.version = "%prog " + self.version
         self.parser = optparse.OptionParser(usage=self.usage, version=self.version)
-        self.parser.add_option('-g', '--gridsize', action='store', type='int', nargs=2, dest='grid_size',
-                                help='Two paramaters, the x and y size of the puzzle grid to be created. The default is 20 by 20')
+        self.parser.add_option('-g', '--gridsize', action='store', type='int', nargs=2,
+                               dest='grid_size', help='Two paramaters, the x and y size of ' + 
+                                    'the puzzle grid to be created. The default is 20 by 20')
+        self.parser.add_option('-o','--outputpath', action='store', type='string', nargs=1,
+                               dest='outputpath', help='Where to create the puzzle, must be '+
+                               'a directory if the pathname is a directory')
         self.parser.add_option('-d', '--directions',action='store', type='int', dest='directions',
-                                help='''specifies the directions in which the puzzle can be drawn
-        Directions are as listed: 
-        
-        ( Left to Right = 1, Right to Left = 2, 
-        Up = 4, Down = 8, Diag Up to Left = 16, Diag Up to Right = 32,
-        Diag Down to Left = 64, Diag Down to Right = 128)
+                                help='''Directions words can traverse puzzle.
+[1|2|4|8|16|32|64|128].
+( Left to Right = 1, Right to Left = 2, Up = 4, Down = 8, Diag Up to Left = 16,
+Diag Up to Right = 32, Diag Down to Left = 64, Diag Down to Right = 128)
 
-        Combining the directions gives us:
-        
-           Very BASIC:\t  9 = Right + Down (default)\n
-           BASIC:\t\t 11 = Right + Left + Down\n
-           InterMediate:\t143 = Right + Left + Down + Up + DiagDwnRight\n
-           WINNER:\t\t256 = All Directions
-         '''
+Combine directions such as:
+9 = Right[1] + Down[8] (default);
+11 = Right[1] + Left[2] + Down[8];
+143 = Right[1] + Left[2] + Down[8] + Up[4] + DiagDwnRight[128];
+256 = All Directions
+'''
          )
     
-    def read_cmdline_options(self):
-        (self.options, self.args) = self.parser.parse_args()
+    def read_cmdline(self):
+        options, self.args = self.parser.parse_args()
 
-    def get_gridsize(self):
-        if len(self.options.grid_size) == 2:
-            self.rows = self.options.grid_size[0]
-            self.cols = self.options.grid_size[1]
-        else:
-            self.parser.print_help()
-            sys.exit(2)
+        if options.grid_size is not None:
+            self.rows = options.grid_size[0]
+            self.cols = options.grid_size[1]
         
+        if options.directions is not None:
+            self.directions = options.directions
+            
     def get_cmdline(self):
-        
-        if self.args is None or self.options is None:
-            return
-        
+        self.read_cmdline()
         if len(self.args) < 1: # Did I get a filename?
             self.parser.print_help()
             sys.exit(2)
 
-        self.get_gridsize()    
-        
-        return self.args[0], self.rows, self.cols, self.options.directions
+        return self.args[0], self.rows, self.cols, self.directions
 
 if __name__ == '__main__':
     pass
