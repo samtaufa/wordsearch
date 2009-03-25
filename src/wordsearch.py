@@ -22,6 +22,9 @@ class wordsearch:
         self.wlaccepted = []
         self.wlrejected = []
         self.wsformat = wsmatrix.WSformats()
+        self.format = 'html'
+        self.outputpath = ''
+        self.minimumwordlength = 0
         
     def load(self, filename):
         fh = self.wsstreamio.open(filename)
@@ -31,6 +34,7 @@ class wordsearch:
     def process(self):
         
         self.wstext.setLanguage('to')
+        self.wstext.minimumwordlength = self.minimumwordlength
         self.wstext.setWordlist(self.lines)
         
         self.wstext.wordlist.sort
@@ -46,16 +50,47 @@ class wordsearch:
         self.wsformat.rejected = self.wlrejected
         self.wsformat.solution = self.wsmatrix.wordsplaced
         
-        myaccpeted, mymatrix, mysolution = self.wsformat.html()
+        if self.format == 'html':
+            myaccepted, mymatrix, mysolution = self.wsformat.html()
+            print """
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Wordsearch Puzzle Generation</title>
+</head>
+<body>
+<table class=''>
+            <tr><th>Word Search Puzzle</th><th>Word List</th></tr>
+            <tr><td valign='top'>%s</td><td valign='top'>%s</td></tr>
+            </table>
+            <hr />
+            <h2>Solution</h2>
+            %s
+            </body>
+            </html>
+            """ % (mymatrix, myaccepted, mysolution)
+        elif self.format == 'xml':
+            myaccepted, mymatrix, mysolution = self.wsformat.xml()
+        else:
+            myaccepted, mymatrix, mysolution = self.wsformat.unicode()
+            myline = ""
+            for line in myaccepted:
+                myline += line.strip() +", "
+            myaccepted = myline[0:len(myline)-2]
         
-        print mymatrix
-        print "-------------"
-        print mysolution
-        
+            print mymatrix
+            print myaccepted
+            print "-------------"
+            print mysolution
         
     def main(self):
         options = wsoptions.WSoptions()
         pathname, self.rows, self.cols, self.directions = options.get_cmdline()
+        self.format = options.format
+        self.outpath = options.outputpath
+        self.minimumwordlength = options.minimumwordlength
         
         if os.path.isfile(pathname):
             self.load(pathname)

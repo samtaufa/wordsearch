@@ -15,6 +15,9 @@ class WSoptions:
         self.version = "0.00.01"
         self.directions = 1
         self.args = None
+        self.format = 'unicode'
+        self.outputpath = ''
+        self.minimumwordlength = 0
         self.set_options()
     def read_options_default(self):
         pass # Get it from a file?
@@ -35,6 +38,11 @@ class WSoptions:
         self.parser.add_option('-o','--outputpath', action='store', type='string', nargs=1,
                                dest='outputpath', help='Where to create the puzzle, must be '+
                                'a directory if the pathname is a directory')
+        self.parser.add_option('-f','--format', action='store', type='string', nargs=1,
+                               dest='format', help='Output format: [html|unicode|xml]')
+        self.parser.add_option('-l','--minimumwordlength',action='store', type='int', nargs=1,
+                               dest='minimumwordlength', help='Minimum length of word for puzzle',
+                               default=2)
         self.parser.add_option('-d', '--directions',action='store', type='int', dest='directions',
                                 help='''Directions words can traverse puzzle.
 [1|2|4|8|16|32|64|128].
@@ -58,6 +66,11 @@ Combine directions such as:
         
         if options.directions is not None:
             self.directions = options.directions
+            
+        if options.format is not None:
+            self.format = options.format
+            
+        self.minimumwordlength = options.minimumwordlength
             
     def get_cmdline(self):
         self.read_cmdline()

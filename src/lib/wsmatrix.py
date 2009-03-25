@@ -39,6 +39,7 @@ class WSmatrix():
         self.matrix, self.cells_available, self.cells_minleftover = \
             self.init_cells(self.maxrow, self.maxcol)
         self.startCells = []
+        self.minlength = 0
         
         self.language = "to"
         self.WStext = WStext()
@@ -162,6 +163,8 @@ class WSmatrix():
         dirGo = 0
         
         while 1: # Loop through all available words
+            if self.cells_available <= self.cells_minleftover:
+                success = True             
             if success or len(wordlist) == 0:
                 break
             alldirections = self.directions[:]
@@ -221,17 +224,18 @@ class WSmatrix():
                 break
             success, workingMatrix, accepted, rejected2 = self.populate_matrix(workingMatrix, workingList)
             
-            #if self.cells_available <= self.cells_minleftover:
-            #    success = True 
-            if not success:
-                tmp_word = ''
-                tmp_cnt = 0
-                for word in rejected2:
-                    if rejected2[word] > tmp_cnt:
-                        tmp_word = word
-                if tmp_cnt > 0:
-                    rejected += [tmp_word]
-                    workingList.pop(workingList.index(tmp_word))
+            if self.cells_available <= self.cells_minleftover:
+                success = True 
+            if not success: #
+                print "rejected2:", rejected2
+                #for word in rejected2:
+                #    badword = rejected2[random.randint(0, len(rejected2)-1)]
+                #    print "badword: ", badword,
+                #    if word in workingList:
+                #        print " :found:"
+                #        index = workList.index(badword)
+                #        workingList.pop(index)
+                #        break
 
         if rejected2 != []:
             rejected += rejected2
@@ -251,7 +255,9 @@ class WSmatrix():
         storeCellContent = ''
         word = wordList[0]
         for i in range(len(word)):
-            storeCellContent += matrix[row][col] 
+            storeCellContent += matrix[row][col]
+            if matrix[row][col] == self.INPUT_MASK:
+                self.cells_available -= 1
             matrix[row][col] = word[i]
             row, col = self.cellNext((row,col), direction)
         success, matrix, accepted, rejected = self.populate_matrix(matrix, wordList[1:])
@@ -261,6 +267,8 @@ class WSmatrix():
         row, col = startPos
         for i in range(len(storeCellContent)):
             matrix[row][col] = storeCellContent[i]
+            if matrix[row][col] == self.INPUT_MASK:
+                self.cells_available += 1
             row, col = self.cellNext((row, col), direction)
         
     def canInsertWord(self, word, startPos, direction, matrix):
@@ -374,17 +382,18 @@ class WStext():
     """
         Utilities for managing WS wordlists
     """
-    def __init__(self, wordlist = [], maxlength = 1000, lingua = "to"):
+    def __init__(self, wordlist = [], maxlength = 1000, lingua = "to", minlength = 0):
         self.maxlength = maxlength
+        self.minimumwordlength = minlength
         self.wordlist = []
         self.wordlist_rejected = []
         self.language = self.setLanguage( lingua )
         self.wordlist, self.wordlist_rejected = self.sanitize_words(wordlist, maxlength)
+        
     def setWordlist(self, lines = []):
         """set the wordlist from lines of text"""
         self.wordlist = []
         for line in lines:
-
             tokens = self.language.w_Tokens(line.lower())
             for token in tokens:
                 if not token in self.wordlist:
@@ -404,7 +413,7 @@ class WStext():
         return lang
     
 
-    def sanitize_words(self, wordlist = [], maxlength = 0):
+    def sanitize_words(self, wordlist = [], maxlength = 0, minlength = 0):
         """
             Sanitise the Wordlist by building a list of
             acceptable characters for a word
@@ -418,6 +427,9 @@ class WStext():
         if maxlength == 0:
             maxlength = self.maxlength
         
+        if minlength == 0:
+            minlength = self.minimumwordlength
+            
         goodwords = []
         rejects   = []
         
@@ -425,10 +437,10 @@ class WStext():
             if len(word) == 0:
                 continue
             word = self.language.w_Tokens(word)[0]            
-            if len(word) > maxlength:
-                rejects.append(word)
-            else:
+            if minlength <= len(word) <= maxlength:
                 goodwords.append(word)
+            else:
+                rejects.append(word)
                 
         return goodwords, rejects
 
@@ -500,7 +512,7 @@ class WSformats():
         x = len (self.letterBin)
         if x > 0:
             return self.letterBin[random.randint(0, x - 1)]
-        return INPUT_MASK
+        return self.INPUT_MASK
  
     def html(self, accepted=[], matrix=[], solution={}):
         if accepted == []:
@@ -597,10 +609,9 @@ class WSformats():
         return mysolution
     
     def unicode_accepted(self, accepted = []):        
-        myaccepted = ""
+        myaccepted = []
         for word in accepted:
-            myaccepted += "\n  %s" % str(word)
-        myaccepted += "\n"
+            myaccepted.append(word)
         return myaccepted
         
     def unicode_matrix(self, matrix = [], obfuscate = True):        

@@ -133,6 +133,17 @@ class u_WSmatrix(libpry.AutoTree):
         #~ print "accepted: ", accepted, test.wordsplaced
         #~ print "rejected: ", rejected, test.wordsrejected
         
+    def test_longlist(self):
+        words =['bitspace','extras','officious', 'as','it','may','seem','to','some','considering',
+        'the','significance','wonderous','proposals','obstinate','peter','paul','mary','children','christmas',
+        'trees','foundations','thrillseeking','frivolous']
+        directions = WSdirections()
+        test = WSmatrix((7,9),directions.Right|directions.Left|directions.Up|directions.Down,words)
+        success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
+        #assert rejected == []
+        print
+        test.display(matrix)
+        
     def test_cellNext(self):
         pass
         
