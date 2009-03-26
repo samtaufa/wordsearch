@@ -358,6 +358,8 @@ class WSdirections():
             :combined an integer concatination of directions
         """
         directions = self.Chosen
+        if combined > 255: combined = 255
+        if combined <= 0: combined = 1
         for i in range(0, len(self.Directions)):
             if combined & self.Directions[i]:
                 directions.append(self.Directions[i])
@@ -501,12 +503,9 @@ class WSformats():
     def fillLetterBin(self, accepted = []):
         if accepted == []:
             accepted = self.accepted        
-        
-        all_letters = ""
+
         for line in accepted:
-            all_letters += line
-        
-        self.letterBin = all_letters
+            self.letterBin += line
         
     def getLetter(self):
         x = len (self.letterBin)
@@ -591,7 +590,6 @@ class WSformats():
         return myaccepted, mymatrix, mysolution
     
     def unicode_solution(self, matrix, accepted, solution):
-        
         keys = solution.keys()
         keys.sort()
         mysolution =""
@@ -603,7 +601,6 @@ class WSformats():
                     solution[word][1][0] + 1, solution[word][1][1] + 1,
                     self.textDirection(solution[word][2]))
         mysolution += "\n"
-        mysolution += "\n\n"
         mysolution += self.unicode_matrix(matrix,False)
         
         return mysolution
@@ -617,17 +614,14 @@ class WSformats():
     def unicode_matrix(self, matrix = [], obfuscate = True):        
         rows = len(matrix)
         cols = len(matrix[0])
-        mymatrix = ""
-        
+        mymatrix = "\n"
         for row in range(rows):
-            mymatrix += "\n    "
             for col in range(cols):
                 cellvalue = matrix[row][col]
                 if cellvalue[0] == self.INPUT_MASK and obfuscate:
                     cellvalue = self.getLetter()
-                    
                 mymatrix += "%s " % cellvalue
-            mymatrix += ""
+            mymatrix += "\n"
         mymatrix += "\n"
         return mymatrix
     
