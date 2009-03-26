@@ -53,7 +53,7 @@ Combine directions such as:
 9 = Right[1] + Down[8] (default);
 11 = Right[1] + Left[2] + Down[8];
 143 = Right[1] + Left[2] + Down[8] + Up[4] + DiagDwnRight[128];
-256 = All Directions
+255 = All Directions
 '''
          )
     
