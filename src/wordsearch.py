@@ -82,8 +82,9 @@ class wordsearch:
         
             print mymatrix
             print myaccepted
-            print "-------------"
-            print mysolution
+            print "(%s of %s)" %(self.wsmatrix.cells_available, self.wsmatrix.maxrow * self.wsmatrix.maxcol)
+            #print "-------------"
+            #print mysolution
         
     def main(self):
         options = wsoptions.WSoptions()
