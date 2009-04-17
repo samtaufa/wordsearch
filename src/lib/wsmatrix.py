@@ -401,19 +401,8 @@ class WStext():
             tokens = self.language.w_Tokens(line.lower())
             for token in tokens:
                 if not token in self.wordlist: # try and put the token in
-                    inword = False
-                    for i in range(len(self.wordlist)):
-                        word = self.wordlist[i]
-                        if token in word:
-                            inword = True
-                            break
-                        if word in token:
-                            inword = True
-                            self.wordlist[i] = token
-                            break                            
-                    if not inword:
-                        self.wordlist.append(token)
-                    
+                    self.wordlist.append(token)
+  
         self.wordlist, self.wordlist_rejected = self.sanitize_words(self.wordlist, self.maxlength)
     def setLanguage(self, lingua):
         
@@ -448,18 +437,46 @@ class WStext():
         goodwords = []
         rejects   = []
         
+        # check word length
+        
         for word in wordlist:
             if len(word) == 0:
                 continue
             word = self.language.w_Tokens(word)[0]            
-            if minlength <= len(word) <= maxlength:
+            if minlength <= len(word) <= maxlength:                
                 goodwords.append(word)
             else:
                 rejects.append(word)
-                
+
+        goodwords, rejects = self.sanitize_nosubwords(goodwords, rejects)
         goodwords = self.sanitize_sortbysize(goodwords)
         return goodwords, rejects
 
+    def sanitize_nosubwords(self, wordlist = [], rejects = []):
+        newwordlist = []
+        if len(wordlist) <= 0:
+            return wordlist, rejects  
+        newwordlist.append(wordlist[0])
+        for i in range(1, len(wordlist)):
+            word = wordlist[i]
+            subword = False
+            for j in range(len(newwordlist)):
+                nword = newwordlist[j]
+                if word in nword:
+                    subword = True
+                    if not word in rejects:
+                        rejects.append(word)
+                    break
+                if nword in word:
+                    subword = True
+                    newwordlist[j] = word
+                    if not nword in rejects:
+                        rejects.append(nword)
+                    break
+            if not subword:
+                newwordlist.append(word)
+        return newwordlist, rejects
+        
     def sanitize_sortbysize(self, wordlist = []):
         """
             Sanitise the wordlist by returning a sorted list
@@ -474,6 +491,7 @@ class WStext():
                 mydict[wordlength] = [word]
                 
         k = mydict.keys()
+        k.sort()
         k.reverse()
         mywordlist = []
         for key in k:
