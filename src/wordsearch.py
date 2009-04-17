@@ -32,7 +32,6 @@ class wordsearch:
         self.lines = self.wsstreamio.lines
         
     def process(self):
-        
         self.wstext.setLanguage('to')
         self.wstext.minimumwordlength = self.minimumwordlength
         self.wstext.setWordlist(self.lines)
