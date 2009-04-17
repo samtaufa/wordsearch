@@ -49,19 +49,20 @@ class wordsearch:
         self.wsformat.accepted = self.wlaccepted
         self.wsformat.rejected = self.wlrejected
         self.wsformat.solution = self.wsmatrix.wordsplaced
+        wordcount = 0
         
         if self.format == 'html':
             myaccepted, mymatrix, mysolution = self.wsformat.html()
             print """
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Wordsearch Puzzle Generation</title>
-</head>
-<body>
-<table class=''>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+            <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                <title>Wordsearch Puzzle Generation</title>
+            </head>
+            <body>
+            <table class=''>
             <tr><th>Word Search Puzzle</th><th>Word List</th></tr>
             <tr><td valign='top'>%s</td><td valign='top'>%s</td></tr>
             </table>
@@ -75,14 +76,19 @@ class wordsearch:
             myaccepted, mymatrix, mysolution = self.wsformat.xml()
         else:
             myaccepted, mymatrix, mysolution = self.wsformat.unicode()
+            #myaccepted = self.wstext.sanitize_sortbysize(myaccepted)
             myline = ""
             for line in myaccepted:
                 myline += line.strip() +", "
+                wordcount += 1
             myaccepted = myline[0:len(myline)-2]
         
-            print mymatrix
+            spotfilled = self.wsmatrix.cells_available
+            matrixsize = self.wsmatrix.maxrow * self.wsmatrix.maxcol
+            matrixratio = int(spotfilled / float(matrixsize) * 100)
+            print mymatrix,
             print myaccepted
-            print "(%s of %s)" %(self.wsmatrix.cells_available, self.wsmatrix.maxrow * self.wsmatrix.maxcol)
+            print "%s words (%s of %s cells spot filled [%s%%])" %(wordcount, spotfilled, matrixsize, matrixratio),
             #print "-------------"
             #print mysolution
         
