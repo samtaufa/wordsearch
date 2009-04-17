@@ -40,22 +40,30 @@ class WSoptions:
                                'a directory if the pathname is a directory')
         self.parser.add_option('-f','--format', action='store', type='string', nargs=1,
                                dest='format', help='Output format: [html|unicode|xml]')
-        self.parser.add_option('-l','--minimumwordlength',action='store', type='int', nargs=1,
+        self.parser.add_option('-m','--minimumwordlength',action='store', type='int', nargs=1,
                                dest='minimumwordlength', help='Minimum length of word for puzzle',
                                default=2)
-        self.parser.add_option('-d', '--directions',action='store', type='int', dest='directions',
+        self.parser.add_option('-d', '--directions', action='store', type='int', dest='directions',
                                 help='''Directions words can traverse puzzle.
-[1|2|4|8|16|32|64|128].
-( Left to Right = 1, Right to Left = 2, Up = 4, Down = 8, Diag Up to Left = 16,
-Diag Up to Right = 32, Diag Down to Left = 64, Diag Down to Right = 128)
-
-Combine directions such as:
-9 = Right[1] + Down[8] (default);
-11 = Right[1] + Left[2] + Down[8];
-143 = Right[1] + Left[2] + Down[8] + Up[4] + DiagDwnRight[128];
-255 = All Directions
-'''
+            [1|2|4|8|16|32|64|128].
+            ( Left to Right = 1, Right to Left = 2, Up = 4, Down = 8, Diag Up to Left = 16,
+            Diag Up to Right = 32, Diag Down to Left = 64, Diag Down to Right = 128)
+            
+            Combine directions such as:
+            9 = Right[1] + Down[8] (default);
+            11 = Right[1] + Left[2] + Down[8];
+            143 = Right[1] + Left[2] + Down[8] + Up[4] + DiagDwnRight[128];
+            255 = All Directions
+            '''
          )
+        self.parser.add_option('-l', '--level', action='store', type='int', dest='level',
+                              help='''Level of Difficulty [1-5]. A simplified amalgamation of directions.
+            Level 1 (Basic [9]- default) Left to Right and Down,
+            Level 2 (Sweet [137]) Right, Down, DiagDwnRight
+            Level 3 (Challenger [143]) Right, Left, Down, Up, DiagDwnRight
+            Level 4 (Try Me [175]) Right, Left, Down, Up, DiagDwnRight, DiagUpRight
+            Level 5 (All Out [255]) All Directions
+            ''')
     
     def read_cmdline(self):
         options, self.args = self.parser.parse_args()
@@ -69,6 +77,22 @@ Combine directions such as:
             
         if options.format is not None:
             self.format = options.format
+            
+        if options.level is not None:
+            if options.level > 5:
+                level = 5
+            else:
+                level = options.level
+            if level == 5:
+                self.directions = 255
+            elif level == 1:
+                self.directions = 9
+            elif level == 2:
+                self.directions = 137
+            elif level == 3:
+                self.directions = 143
+            elif level == 4:
+                self.directions = 175
             
         self.minimumwordlength = options.minimumwordlength
             
