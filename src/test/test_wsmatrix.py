@@ -101,7 +101,7 @@ class u_WSmatrix(libpry.AutoTree):
         directions = WSdirections()
         test = WSmatrix((11,11),directions.Right | directions.Left,words)
         matrix, accepted, rejected = test.populate()
-        assert rejected == ['spontaneously']
+        assert rejected == ['spontaneously', 'is', 'us']
         #~ print
         #~ test.display(matrix)
         #~ print accepted
@@ -199,18 +199,55 @@ class u_WStext(libpry.AutoTree):
 
     def test_sanitize_length(self):
         wordlist = ["short", "notshorter", "longing", "verylongword"]
-        expect   = ["short", "notshorter", "longing" ]
-        expectlong= ["verylongword"]
+        expect   = ["notshorter", "longing" ]
+        expectreject= ["verylongword", "short"]
         test = WStext(wordlist, 11)
         assert test.wordlist == expect
-        assert test.wordlist_rejected == expectlong
+        assert test.wordlist_rejected == expectreject
         
     def test_sanitize_content(self):
         wordlist =["short", "not6shorter", "longing","verylongword"]
-        expect =  ["short", "not", "longing","verylongword"]
-        test = WStext(wordlist)
+        expect =  ["longing", "short", "not"]
+        test = WStext(wordlist, 11)
         assert test.wordlist == expect
-        assert test.wordlist_rejected == []
+        assert test.wordlist_rejected == ["verylongword"]
+    
+    def test_sanitize_words(self):
+        wordlist = ["word", "is", "his", "short"]
+        expect = ["short", "word", "his"]
+        reject = []
+        test = WStext(wordlist, 11)
+        good, bad = test.sanitize_words(wordlist, 11)
+        assert good == expect
+        assert bad == ["is"]
+    def test_sanitize_nosubwords(self):
+        wordlist = ["short", "word", "is", "his"]
+        expect = ["short", "word", "his"]
+        reject = []
+        test = WStext(wordlist, 11)
+        good, bad = test.sanitize_nosubwords(wordlist, reject)
+        assert good == expect
+        assert bad == ["is"]
+        wordlist = ["short", "notshorter", "longing", "long", "verylongword"]
+        expect = ["notshorter", "longing", "verylongword"]
+        reject = []
+        test = WStext(wordlist)
+        good, bad = test.sanitize_nosubwords(wordlist, reject)
+        assert good == expect
+        assert bad == ["short", "long"]
+        
+    def test_sanitize_sortbysize(self):
+        wordlist = ["word", "is", "his", "short"]
+        expect = ["short", "word", "his", "is"]
+        test = WStext(wordlist, 11)
+        answer = test.sanitize_sortbysize(wordlist)
+        assert answer == expect
+        wordlist = ["longing", "notshorter"]
+        expect = ["notshorter","longing"]
+        test = WStext(wordlist, 11)
+        answer = test.sanitize_sortbysize(wordlist)
+        assert answer == expect
+        
 class u_WSformats(libpry.AutoTree):
     def setUpAll(self):
         words =['bitspaceX', 'this','one','will','do', 'just', 'fine', 'thankyou']
