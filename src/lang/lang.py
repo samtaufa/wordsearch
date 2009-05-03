@@ -1,42 +1,47 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2008, Samiuela Loni Vea Taufa
-# All rights reserved.
-#
-# see LICENSE.TXT for license/copyright information
+"""
+    lang.Language
+    
+    Language
+
+    :copyright: (c) 2009, Samiuela Loni Vea Taufa
+    :license: MIT, see LICENSE.txt for more details
+
+    Unicode Text: "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóôõöúûüĀāĒēĨĩĪīŌōŨũŪūẼẽ"
+
+"""
 import string, unicodedata
 
 class Language:
+    """
+        Base Language Class
+        
+        Defines basic methods for managing character sets in a Language
+        
+        'c_' denote 'character' methods
+        'w_' denote 'word' methods
+    """
     def __init__(self):
         self.charSet = ""
         self.charSetExt = ""
+        self.wordConstructs = ""
         self.initGlottals()
         self.initCharSet()
         self.initCharSetExt()
+        self.wordConstructs = self.charSet + self.charSetExt
+
+    def initGlottals(self):
+        self.apostrophe  = unicodedata.lookup('APOSTROPHE')
+        self.glottals_all = self.apostrophe
     def initCharSet(self):
         self.charSet = unicode(string.letters)
     def initCharSetExt(self):
         self.charSetExt = self.apostrophe
-    def initGlottals(self):
-        self.glottals_all = (unicodedata.lookup('APOSTROPHE') +
-                             unicodedata.lookup('GRAVE ACCENT') +
-                             unicodedata.lookup('ACUTE ACCENT') +
-                             unicodedata.lookup('MODIFIER LETTER TURNED COMMA') +
-                             unicodedata.lookup('MODIFIER LETTER APOSTROPHE') +
-                             unicodedata.lookup('MODIFIER LETTER REVERSED COMMA') +
-                             unicodedata.lookup('MODIFIER LETTER ACUTE ACCENT') +
-                             unicodedata.lookup('MODIFIER LETTER GRAVE ACCENT') +
-                             unicodedata.lookup('COMBINING TURNED COMMA ABOVE') +
-                             unicodedata.lookup('COMBINING REVERSED COMMA ABOVE') +
-                             unicodedata.lookup('COMBINING COMMA ABOVE') +
-                             unicodedata.lookup('COMBINING COMMA ABOVE RIGHT') +
-                             unicodedata.lookup('COMBINING GRAVE TONE MARK') +
-                             unicodedata.lookup('COMBINING ACUTE TONE MARK') +
-                             unicodedata.lookup('LATIN LETTER GLOTTAL STOP') +
-                             unicodedata.lookup('LATIN CAPITAL LETTER GLOTTAL STOP')
-                             )
-        self.apostrophe  = unicodedata.lookup('APOSTROPHE')
     def c_allowNumerics( self, numerics = "" ):
+        """
+            Allow Numerics as part of the extended character set
+        """
         if numerics == "":
             numerics = string.digits
             
@@ -45,8 +50,11 @@ class Language:
                 self.charSetExt += i
                 
     def c_addCharacters( self, allowThese = ""):
+        """
+            add 'allowThese' characters to the Extended Character set.
+        """
         for c in allowThese:
-            if not ( c in self.charSet or c in self.charSetExt):
+            if not ( c in self.charSetExt ):
                 self.charSetExt += c
                 
     def c_delCharacters( self, blockThese = u""):
@@ -78,12 +86,10 @@ class Language:
         iCurr = 0
         iMax  = len(line)
         Tokens = []
-        
-        wordConstructs = self.charSet + self.charSetExt
-        
+              
         for iCurr in range(0, iMax):
             letter = line[iCurr]
-            if letter in wordConstructs:
+            if letter in self.wordConstructs:
                 if iCurr == iMax-1: # last letter special exception
                     if letter not in self.glottals_all:
                         Tokens.append(line[iTokenStart:iMax])
