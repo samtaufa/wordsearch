@@ -1,5 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+    Test classes for lib.wsmatrix and lib.wsstreamio
+
+    :copyright: (c) 2009, Samiuela Loni Vea Taufa
+    :license: MIT, see LICENSE.txt for more details
+"""
+
 import libpry
 from lib.wsmatrix import WSmatrix, WSdirections, WStext, WSformats
+from lib.wsstreamio import WSstreamIO
 import sys
 
 class u_WSmatrix(libpry.AutoTree):
@@ -140,9 +150,9 @@ class u_WSmatrix(libpry.AutoTree):
         directions = WSdirections()
         test = WSmatrix((7,9),directions.Right|directions.Left|directions.Up|directions.Down,words)
         success, matrix, accepted, rejected = test.populate_matrix(test.matrix, words)
-        #assert rejected == []
-        print
-        test.display(matrix)
+        #~ #assert rejected == []
+        #~ print
+        #~ test.display(matrix)
         
     def test_cellNext(self):
         pass
@@ -260,22 +270,18 @@ class u_WSformats(libpry.AutoTree):
         self.format.rejected = rejected
         self.format.solution = test.wordsplaced
         
-    def setUp(self):
-        pass
-    def tearDown(self):
-        pass
     def tearDownAll(self):
         pass
     def test_html(self):
-        myaccepted, mymatrix, mysolution = self.format.html()
-        #~ print myaccepted
-        #~ print mymatrix
-        #~ print mysolution
+        self.format.html()
+        #~ print self.format.acceptedFormatted
+        #~ print self.format.matrixFormatted
+        #~ print self.format.solutionFormatted
     def test_unicode(self):
-        myaccepted, mymatrix, mysolution = self.format.unicode()
-        #~ print myaccepted
-        #~ print mymatrix
-        #~ print mysolution
+        self.format.unicode()
+        #~ print self.format.acceptedFormatted
+        #~ print self.format.matrixFormatted
+        #~ print self.format.solutionFormatted
     def test_xml(self):
         pass
     def test_getLetter(self):
@@ -283,9 +289,29 @@ class u_WSformats(libpry.AutoTree):
         #~ for i in range(0,10):
             #~ print self.format.getLetter()," ",
         #~ print
+class u_WSlang(libpry.AutoTree):
+    def setUpAll(self):
+        self.wsstreamio = WSstreamIO()
+        self.wstext = WStext()
+        self.wstext.setLanguage('to')
+        fh = self.wsstreamio.open('unicode.txt')
+        self.wsstreamio.load(fh)
+        self.lines = self.wsstreamio.lines
+        self.originalEncoding = self.wsstreamio.originalEncoding        
+        
+    def test_loadfile(self):
+        self.wstext.setWordlist(self.lines)
+        lineswordcount = 0
+        for line in self.lines:
+            for word in line:
+                lineswordcount += 1
+        assert lineswordcount > len(self.wstext.wordlist)
+        #~ for i in range(len(self.wstext.wordlist)):
+            #~ print "[%s]" % str(self.wstext.wordlist[i]),
 tests = [
     u_WSmatrix(),
     u_WSdirections(),
     u_WStext(),
-    u_WSformats()
+    u_WSformats(),
+    u_WSlang()
 ]

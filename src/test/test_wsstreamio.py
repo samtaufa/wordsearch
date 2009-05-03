@@ -1,9 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2008, Samiuela Loni Vea Taufa
-# All rights reserved.
-#
-# see LICENSE.TXT for license/copyright information
-# Unicode Text: "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóôõöúûüAaEeIiIiOoUuUu??"
+"""
+
+    :copyright: (c) 2009, Samiuela Loni Vea Taufa
+    :license: MIT, see LICENSE.txt for more details
+
+    Unicode Text: "ÃÃ‚ÃƒÃ„Ã‰ÃŠÃ‹ÃÃÃÃ“Ã”Ã•Ã–ÃšÃ›ÃœÃ¡Ã¢Ã£Ã¤Ã©ÃªÃ«Ã­Ã®Ã¯Ã³Ã´ÃµÃ¶ÃºÃ»Ã¼Ä€ÄÄ’Ä“Ä¨Ä©ÄªÄ«ÅŒÅÅ¨Å©ÅªÅ«áº¼áº½"
+
+"""
 
 import libpry
 import sys

@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+
+    :copyright: (c) 2009, Samiuela Loni Vea Taufa
+    :license: MIT, see LICENSE.txt for more details
+"""
+
 import libpry
 from lib.wsoptions import WSoptions
 from lib.wsmatrix import WSdirections
