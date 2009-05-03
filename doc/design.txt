@@ -1,4 +1,6 @@
-Since I don't recall the original code, there's some further reading below to help 'explain' the text further.
+Supposed design notes, aka scratch pad of items to pursue(d).
+
+Since I don't recall my original code, there's some further reading below to help 'explain' the text further.
 
 * Direction Markers.
 =========================
