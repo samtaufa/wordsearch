@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2008, Samiuela Loni Vea Taufa
-# All rights reserved.
-#
-# see LICENSE.TXT for license/copyright information
-import optparse, sys, os, os.path
+"""
+
+    :copyright: (c) 2009, Samiuela Loni Vea Taufa
+    :license: MIT, see LICENSE.txt for more details
+"""
+import optparse, sys
 
 class WSoptions:
     def __init__(self):      
@@ -17,8 +18,10 @@ class WSoptions:
         self.args = None
         self.format = 'unicode'
         self.outputpath = ''
+        self.article = False
         self.minimumwordlength = 0
         self.set_options()
+        
     def read_options_default(self):
         pass # Get it from a file?
     
@@ -26,12 +29,18 @@ class WSoptions:
         self.usage = """
         usage: %prog [options] pathname
 
-        where pathname is the file or directory
-        containing words for generating wordsearch
-        puzzle(s)
+        where pathname is the file containing words
+        for generating wordsearch puzzle(s).
+        The file lists a different word for each line
+        unless using the --article option where the
+        file contains an 'article' or 'story' from
+        which words are collected for the puzzle.
         """
         self.version = "%prog " + self.version
         self.parser = optparse.OptionParser(usage=self.usage, version=self.version)
+        self.parser.add_option('','--article',action='store_true', dest='article',
+                               help='The input file is an article',
+                               default=False)
         self.parser.add_option('-g', '--gridsize', action='store', type='int', nargs=2,
                                dest='grid_size', help='Two paramaters, the x and y size of ' + 
                                     'the puzzle grid to be created. The default is 20 by 20')
@@ -95,7 +104,9 @@ class WSoptions:
                 self.directions = 175
             
         self.minimumwordlength = options.minimumwordlength
-            
+        self.article = options.article
+        self.outputpath = options.outputpath
+        
     def get_cmdline(self):
         self.read_cmdline()
         if len(self.args) < 1: # Did I get a filename?
