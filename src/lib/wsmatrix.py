@@ -1,16 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2008, Samiuela Loni Vea Taufa
-# All rights reserved.
-#
-# see LICENSE.TXT for license/copyright information
-#
-# 
+"""
+    lib.wsmatrix
+    
+    Word Search Matrix Manipulation Classes
+
+    :copyright: (c) 2009, Samiuela Loni Vea Taufa
+    :license: MIT, see LICENSE.txt for more details
+
+    Unicode Text: "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóôõöúûüĀāĒēĨĩĪīŌōŨũŪūẼẽ"
+
+"""
+
 import random, string, copy, time
+from BeautifulSoup import BeautifulSoup
 
 class WSmatrix():
     """
-        WS Matrix and management utilities
+        Given content, this class will manage and manipulate
+        generation of the word serach matrix (grid)
     """  
     def __init__(self, size=(20,20), directions = 1, wordlist = []):
         """
@@ -330,7 +338,7 @@ class WSmatrix():
         return row, col
 class WSdirections():
     """
-        Utilities for management of WS directions
+        Class for management of directions within the word search matrix/grid
     """
     def __init__(self):
         self.Right = 1
@@ -384,7 +392,7 @@ class WSdirections():
 
 class WStext():
     """
-        Utilities for managing WS wordlists
+        Class for filtering word list content
     """
     def __init__(self, wordlist = [], maxlength = 1000, lingua = "to", minlength = 0):
         self.maxlength = maxlength
@@ -519,12 +527,21 @@ class WStext():
             self.wordlist_rejected.append(word)
             
 class WSformats():
+    """
+        Class to format word search puzzle, solution, placed wordlist,
+        and article.
+    """
     def __init__(self, accepted =[], matrix=[], solution={}, rejected = []):
         self.accepted = accepted
         self.matrix = matrix
         self.rejected = rejected
         self.solution = solution
         self.letterBin = ""
+        self.acceptedFormatted = ""
+        self.matrixFormatted = ""
+        self.solutionFormatted = ""
+        self.title = "Word Search Puzzle"
+        self.subtitle ="Challenge Yourself"
         
         if accepted != []:
             self.fillLetterBin()
@@ -565,7 +582,6 @@ class WSformats():
         if x > 0:
             return self.letterBin[random.randint(0, x - 1)]
         return self.INPUT_MASK
- 
     def html(self, accepted=[], matrix=[], solution={}):
         if accepted == []:
             accepted = self.accepted        
@@ -580,52 +596,80 @@ class WSformats():
         mymatrix = self.html_matrix(matrix)
         mysolution = self.html_solution(matrix, accepted, solution)
 
-        return myaccepted, mymatrix, mysolution
+        self.acceptedFormatted = myaccepted
+        self.matrixFormatted = mymatrix
+        self.solutionFormatted = mysolution
     
     def html_solution(self, matrix, accepted, solution):
         
         keys = solution.keys()
         keys.sort()
-        mysolution ="<table class='wssolution'>"
-        mysolution += "\n  <tr><th>Word</th><th>Start @</th><th>Direction</th></tr>"
+        mysolution ="<p class='ws-solution'>"
+        mysolution += "\n"
         for word in keys:
             if word in accepted:
-                mysolution += "\n  <tr><td>%s</td><td>(%s,%s)</td><td>%s</td></tr>" % (
+                mysolution += "  %s (%s,%s) %s<br />\n" % (
                     word,
                     solution[word][1][0] + 1, solution[word][1][1] + 1,
                     self.textDirection(solution[word][2]))
-        mysolution += "\n</table>"
-        mysolution += "\n\n"
+        mysolution += "\n</p>"
+        mysolution += "\n"
         mysolution += self.html_matrix(matrix,False)
         
         return mysolution
     
     def html_accepted(self, accepted = []):        
-        myaccepted = "<table class='WStext'>"
+        htmlaccepted = "<p class='ws-wordlist'>\n"
         for word in accepted:
-            myaccepted += "\n  <tr><td>" + str(word) + "</td></tr>"
-        myaccepted += "\n</table>"
-        return myaccepted
+            htmlaccepted += " " + str(word) + ","
+        htmlaccepted = htmlaccepted[0:-1] + "</p>\n"
+        return htmlaccepted
         
     def html_matrix(self, matrix = [], obfuscate = True):        
         rows = len(matrix)
         cols = len(matrix[0])
-        mymatrix = "<table class='wsmatrix'>"
-        
+        htmlmatrix = ""
         for row in range(rows):
-            mymatrix += "\n    <tr>"
+            htmlmatrix += "  <p class='ws-puzzle'>"
             for col in range(cols):
                 cellvalue = matrix[row][col]
-                if cellvalue[0] == self.INPUT_MASK and obfuscate:
+                if obfuscate and cellvalue[0] == self.INPUT_MASK:
                     cellvalue = self.getLetter()
-                    
-                mymatrix += "<td>" + cellvalue + "</td>"
-            mymatrix += "</tr>"
-        mymatrix += "\n</table>"
-        return mymatrix
-    
+                htmlmatrix += cellvalue + " " 
+            htmlmatrix += "</p>\n"
+        return htmlmatrix
+    def html_article(self, article, accepted, lingua = "to"):
+        wstext = WStext(lingua)
+        htmlarticle = ""
+        highlighted_words = []
+        for line in article:
+            htmlarticle += "<p class='ws-article'>"
+            #for k, v in wstext.language.transposeDict.iteritems():
+            #    line = line.replace(k,v)
+            
+            for article_word in line.split():
+                sanitised_word = wstext.language.w_Tokens(article_word)[0]
+                restofword = ""
+                if len(sanitised_word) > len(article_word):
+                    restofword = article_word[len(sanitised_word):]
+                for accword in accepted:
+                    if accword == sanitised_word:
+                        if not accword in highlighted_words:
+                            highlighted_words.append(accword)
+                            htmlarticle += "<b><i>" + article_word + "</i></b>" + restofword + " "
+                        else:
+                            htmlarticle += article_word + restofword + " "                            
+                        break 
+                else:
+                    htmlarticle += article_word + " "
+                #htmlarticle += word + " "
+            htmlarticle += "<br />\n"
+        
+        return htmlarticle
+
     def xml(self, accepted=[], matrix=[], solution=[]):
-        pass
+        self.acceptedCount = len(accepted)
+
     def unicode(self, accepted=[], matrix=[], solution={}):
         if accepted == []:
             accepted = self.accepted        
@@ -633,14 +677,16 @@ class WSformats():
             matrix = self.matrix
         if solution == {}:
             solution = self.solution
-        
+
         accepted.sort()
         self.fillLetterBin()
         myaccepted = self.unicode_accepted(accepted)
         mymatrix = self.unicode_matrix(matrix)
         mysolution = self.unicode_solution(matrix, accepted, solution)
 
-        return myaccepted, mymatrix, mysolution
+        self.acceptedFormatted = myaccepted
+        self.matrixFormatted = mymatrix
+        self.solutionFormatted = mysolution
     
     def unicode_solution(self, matrix, accepted, solution):
         keys = solution.keys()
@@ -659,10 +705,10 @@ class WSformats():
         return mysolution
     
     def unicode_accepted(self, accepted = []):        
-        myaccepted = []
+        acceptedline = ""
         for word in accepted:
-            myaccepted.append(word)
-        return myaccepted
+            acceptedline += word +", "
+        return acceptedline[0:len(acceptedline)-2]
         
     def unicode_matrix(self, matrix = [], obfuscate = True):        
         rows = len(matrix)
