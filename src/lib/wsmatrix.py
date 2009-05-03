@@ -12,8 +12,7 @@
 
 """
 
-import random, string, copy, time
-from BeautifulSoup import BeautifulSoup
+import random, time
 
 class WSmatrix():
     """
@@ -621,7 +620,7 @@ class WSformats():
     def html_accepted(self, accepted = []):        
         htmlaccepted = "<p class='ws-wordlist'>\n"
         for word in accepted:
-            htmlaccepted += " " + str(word) + ","
+            htmlaccepted += " " + word + ","
         htmlaccepted = htmlaccepted[0:-1] + "</p>\n"
         return htmlaccepted
         
