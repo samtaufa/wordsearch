@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 
+    Tongan Language extensions to the Language class
+
     :copyright: (c) 2009, Samiuela Loni Vea Taufa
     :license: MIT, see LICENSE.txt for more details
 
@@ -12,9 +14,6 @@ import string, unicodedata
 from lang import Language
 
 class to(Language):
-    """
-        to - Tongan Language extensions to the Language class
-    """
     def __init__(self, wordlist=[]):
         Language.__init__(self)
         self.initCharSet()
@@ -33,7 +32,7 @@ class to(Language):
             self.wordlist = self.c_transpose(wordlist)
         
     def initCharSet(self):
-        self.voweldiacritics = (
+        self.vowel_with_diacritics = (
             unicodedata.lookup('LATIN CAPITAL LETTER A WITH MACRON') +
             unicodedata.lookup('LATIN CAPITAL LETTER E WITH MACRON') +
             unicodedata.lookup('LATIN CAPITAL LETTER I WITH MACRON') +
@@ -55,7 +54,7 @@ class to(Language):
             unicodedata.lookup('LATIN SMALL LETTER O WITH ACUTE') +
             unicodedata.lookup('LATIN SMALL LETTER U WITH ACUTE')
             )
-        self.validVowels = (
+        self.vowels = (
             unicodedata.lookup('LATIN SMALL LETTER A') +
             unicodedata.lookup('LATIN SMALL LETTER E') +
             unicodedata.lookup('LATIN SMALL LETTER I') +
@@ -66,9 +65,9 @@ class to(Language):
             unicodedata.lookup('LATIN CAPITAL LETTER I') +
             unicodedata.lookup('LATIN CAPITAL LETTER O') +
             unicodedata.lookup('LATIN CAPITAL LETTER U') +
-            self.voweldiacritics
+            self.vowel_with_diacritics
         )
-        self.validConsonants = (
+        self.consonants = (
             unicodedata.lookup('LATIN SMALL LETTER F') +
             unicodedata.lookup('LATIN SMALL LETTER H') +
             unicodedata.lookup('LATIN SMALL LETTER K') +
@@ -92,11 +91,11 @@ class to(Language):
             unicodedata.lookup('LATIN CAPITAL LETTER T') +
             unicodedata.lookup('LATIN CAPITAL LETTER V') 
         )
-        self.glottals_to  = unicodedata.lookup('MODIFIER LETTER TURNED COMMA')
+        self.glottal  = unicodedata.lookup('MODIFIER LETTER TURNED COMMA')
             # unicodedata.lookup('LEFTER SINGLE QUOTATION MARK') # when character not available
 
         self.charSet = (
-            self.validConsonants + self.validVowels + self.glottals_to
+            self.consonants + self.vowels + self.glottal
 #           + unicodedata.lookup('FULL STOP')
         )
     def initGlottals(self):
@@ -395,20 +394,36 @@ class to(Language):
             Transpose text in the list using the rules set up
             in transposeDict
         """
-        mytext = text[:]
-
-        for i in range(len(mytext)):
-            line = mytext[i]
+        isString = False
+        if type(text) == type(u""):
+            isString = True
+            text = [text]
+        elif type(text) == type(""):
+            isString = True
+            text = [unicode(text)]
+            
+        newtext = []
+        for i in range(len(text)):
+            line = text[i]
             for k, v in self.transposeDict.iteritems():
                 line = line.replace(k,v)
-            mytext[i] = line
-        return mytext
-    
+            newtext.append(line)
+        
+        if isString: return newtext[0]
+        
+        return newtext
+    def lowercase(self, text=""):
+        """
+            Convert text to lowercase
+        """
+        for k, v in self.toLowerDict.iteritems():
+            text = text.replace(k,v)
+        return text                
     def w_validFirst( self, letter):
         if letter in self.charSet or letter in self.charSetExt:
             return True
         return False
-    def w_Tokens(self, line = ""):
+    def w_Tokens(self, line = u""):
         """
         From a line of text, return tokens for each validated word construct
         """
@@ -420,37 +435,30 @@ class to(Language):
         iCurr = 0
         iMax  = len(line)
         Tokens = []
-        for k, v in self.toLowerDict.iteritems():
-            line = line.replace(k,v)
-
+        wordboundary = False
         for iCurr in range(0, iMax):
             letter = line[iCurr]
-            if letter in self.wordConstructs or (iTokenStart == iCurr and (letter in self.glottals_all)):
-                if iCurr == iMax-1: # last letter special exception
-                    if letter not in self.glottals_all:
-                        Tokens.append(line[iTokenStart:iMax])
-                    else:
-                        Tokens.append(line[iTokenStart:iMax-1])
-                elif letter in self.glottals_all:
-                    if line[iCurr+1] in self.validVowels:
-                        line = line[0:iCurr] + self.glottals_to + line[iCurr+1:]
-                    elif iCurr == iTokenStart:
-                        iTokenStart = iCurr + 1
-                    else:
-                        Tokens.append(line[iTokenStart:iCurr])
-                        iTokenStart = iCurr + 1                        #    Tokens.append(line[iTokenStart:iCurr])
-                        #    iTokenStart = iCurr + 1
-            else:
-                if ( letter in self.glottals_all and
-                     iCurr < iMax - 1 and line[iCurr + 1] in self.validVowels
-                   ):
-                    line = line.replace(line[0:iCurr+1],line[0:iCurr]+self.glottals_to,1)
-                elif iCurr == iTokenStart: # We're still at the start
-                    iTokenStart = iCurr + 1     # Ignore the error and start with the next letter
-                else: # Word-boundary - grab the word prior to this location 
+            if letter in self.glottals_all:
+                if iCurr == iMax - 1:
+                    Tokens.append(line[iTokenStart:iMax -1])
+                elif line[iCurr+1] in self.vowels:
+                    line = line[:iCurr] + \
+                        self.glottal + \
+                        line[iCurr+1:]
+                else: # Word boundary ?
+                    wordboundary = True
+            elif letter in self.wordConstructs:
+                if iCurr == iMax - 1:
+                    Tokens.append(line[iTokenStart:iMax])
+            else: # Word Boundary ?
+                wordboundary = True
+            if wordboundary:
+                if iTokenStart == iCurr:
+                    iTokenStart = iCurr + 1 #i.e. we're inside a non-token
+                else:
                     Tokens.append(line[iTokenStart:iCurr])
                     iTokenStart = iCurr + 1
-            iPrev = iCurr
+                wordboundary = False
         return Tokens
 
 if __name__ == "__main__":

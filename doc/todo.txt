@@ -1,5 +1,0 @@
-TODO
-
-htmlentitydefs.codepoint2name
-    a dictionary that maps Unicode codepoints to HTML entity names
-    

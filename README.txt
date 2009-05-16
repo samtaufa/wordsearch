@@ -1,4 +1,6 @@
-README
+﻿README
+
+Unicode Support:    "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóôõöúûüĀāĒēĨĩĪīŌōŨũŪūẼẽ"
 
 1. What is this
 2. What use is it
@@ -6,6 +8,8 @@ README
 4. What are the requirements
 5. What are the features
 6. Why bother ?
+   . Self Education / Fun
+   . Unicode
 
 1. What is this
 
@@ -67,6 +71,8 @@ help reaffirm sight word skills for the children.
        
 5. Why bother ?
 
+  - Self Education / Fun
+
    I find that family and friends enjoy the distraction offered
    by a wordsearch puzzle, and wanted the ability to create 
    customised puzzles using words in the context of what we
@@ -79,15 +85,41 @@ help reaffirm sight word skills for the children.
    and the other shareware apps out there didn't have the
    features I desperately wanted (support for accented characters.)
    
-   During a school vacation break, I wrote a Turbo C version of 
+   During a school vacation break, I wrote a Turbo C++ version of 
    the puzzle generator to review software algorithm techniques
    such as backtracking, C++ and bitwise mathematics(?)
    
    Once again, Windows 95 transitioned onwards and I lost the
    subsequent .exe's and at some point no longer had a functional
    
+   Sometime passed and I had a functioning Python version of the
+   program, but when I looked at it again, it didn't run on
+   the 'current' version of Python for some reason. (Now that the
+   re-write is complete, I discover the original Python version
+   of the code actually works)
+   
    Recently? I was re-educating myself on programming techniques
    and pointers, backtracking etc. came back like an unwanted
-   itch. But, I wanted to use this problem to learn a new
-   language, so this version of the program is written in
-   poor man's Python.
+   itch. At the same time I was presented with the problem of
+   trying to collect Tongan Language text (with the challenge of
+   maintaining/correcting syntactic errors.)
+   
+   Woo hoo, let's do this in a new 'framework' language ('cause
+   it would be waay to simple to use something you were already
+   confident and familiar with.)
+   
+   Justify things by saying that we'll add a few more interesting
+   challenges to redefine our problem and the wordsearch programming
+   challenge came to light.
+
+  - Unicode
+  
+  Text: "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóôõöúûüĀāĒēĨĩĪīŌōŨũŪūẼẽ"
+  
+  If your text editor can display the full text above (within quotes)
+  without having substituted a "?" mark or square block instead of the
+  letter/character, then you might like this tool.
+  
+  
+
+  

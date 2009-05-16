@@ -6,7 +6,7 @@
     Word Search Matrix Manipulation Classes
 
     :copyright: (c) 2009, Samiuela Loni Vea Taufa
-    :license: MIT, see LICENSE.txt for more details
+    :license: ISCL, see LICENSE.txt for more details
 
     Unicode Text: "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóôõöúûüĀāĒēĨĩĪīŌōŨũŪūẼẽ"
 
@@ -19,11 +19,12 @@ class WSmatrix():
         Given content, this class will manage and manipulate
         generation of the word serach matrix (grid)
     """  
-    def __init__(self, size=(20,20), directions = 1, wordlist = []):
+    def __init__(self, size=(20,20), directions = 1, wordlist = [], wstext = None):
         """
             size: integer values for (maximum rows, maximum cols)
             directions: integer concatenation of directions
             wordlist: list of words
+            wstext: WStext object
         """
         self.matrix   = []        
         self.INPUT_MASK = '*'
@@ -45,11 +46,11 @@ class WSmatrix():
         
         self.matrix, self.cells_available, self.cells_minleftover = \
             self.init_cells(self.maxrow, self.maxcol)
+        self.wstext = wstext
         self.startCells = []
         self.minlength = 0
         
-        self.language = "to"
-        self.WStext = WStext()
+        #self.wstext = wstext
         self.debug = False
         
     def set_directions(self, directions = 1):
@@ -221,9 +222,11 @@ class WSmatrix():
         
         workingList = self.wordlist[:]
         workingMatrix = self.matrix[:]
+        rejected = []
         
         longest = max (self.maxcol, self.maxrow)
-        workingList, rejected = self.WStext.sanitize_words(workingList, longest)
+        rejected = []
+        workingList, rejected = self.wstext.sanitize_words(workingList, longest)
         success = False
         rejected2 = []
         while 1:  # Loop until timed out or success 'conditions' reached
@@ -246,6 +249,7 @@ class WSmatrix():
 
         if rejected2 != []:
             rejected += rejected2
+            print rejected2
         return workingMatrix, accepted, rejected
             
     def insertWord(self,wordList, startPos, direction, matrix):
@@ -388,24 +392,53 @@ class WSdirections():
         """
         self.add(item)
         
+    def __str__(self):
+        vd = [] # valid directions
+        if self.Right in self.Chosen:
+            vd.append("Left to Right")
+        if self.Left in self.Chosen:
+            vd.append("Right to Left")
+        if self.Up in self.Chosen:
+            vd.append("Up")
+        if self.Down in self.Chosen:
+            vd.append("Down")
+        if self.DiagUpLeft in self.Chosen:
+            vd.append("Diagonal Up Right to Left")
+        if self.DiagUpRight in self.Chosen:
+            vd.append("Diagonal Up Left to Right")
+        if self.DiagDwnLeft in self.Chosen:
+            vd.append("Diagonal Down Right to Left")
+        if self.DiagDwnRight in self.Chosen:
+            vd.append("Diagonal Down Left to Right")
+        
+        vdirections = ""
+        for dir in vd:
+            vdirections += "%s, " % dir
+        
+        if vdirections:
+            vdirections = vdirections[:-2]
+            
+        return vdirections
 
 class WStext():
     """
         Class for filtering word list content
     """
-    def __init__(self, wordlist = [], maxlength = 1000, lingua = "to", minlength = 0):
+    def __init__(self, wordlist = [], maxlength = 1000, lingua = "", minlength = 0):
         self.maxlength = maxlength
         self.minimumwordlength = minlength
         self.wordlist = []
         self.wordlist_rejected = []
-        self.language = self.setLanguage( lingua )
-        self.wordlist, self.wordlist_rejected = self.sanitize_words(wordlist, maxlength)
+        self.setLanguage( lingua )
+        if wordlist:
+            self.setWordlist( wordlist )
         
     def setWordlist(self, lines = []):
-        """set the wordlist from lines of text"""
+        """set the wordlist from lines (list) of text (strings)"""
         self.wordlist = []
         for line in lines:
-            tokens = self.language.w_Tokens(line.lower())
+            lowercase = self.language.lowercase(line)
+            tokens = self.language.w_Tokens(lowercase)
             for token in tokens:
                 if not token in self.wordlist: # try and put the token in
                     self.wordlist.append(token)
@@ -413,16 +446,16 @@ class WStext():
         self.wordlist, self.wordlist_rejected = self.sanitize_words(self.wordlist, self.maxlength)
     def setLanguage(self, lingua):
         
-        if lingua == "eng" or lingua[0:1] == "en":
-            from lang.lang import Language as language
-        elif lingua == "local":
+        if lingua.lower() == "eng" or lingua.lower() == "en":
+            from lang.en import en as language
+        elif lingua.lower() == "to":
+            from lang.to import to as language
+        elif lingua.lower() == "local":
             from lang.lang import Language as language
         else:
-            from lang.to import to as language
-            
-        lang = language()
-        return lang
-    
+            #print "hmmmm, didn't understand", lingua.lowercase()
+            from lang.en import en as language
+        self.language = language()
 
     def sanitize_words(self, wordlist = [], maxlength = 0, minlength = 0):
         """
@@ -447,13 +480,13 @@ class WStext():
         # check word length
         
         for word in wordlist:
-            if len(word) == 0:
-                continue
-            word = self.language.w_Tokens(word)[0]            
-            if minlength <= len(word) <= maxlength:                
-                goodwords.append(word)
-            else:
-                rejects.append(word)
+            wordlength = len(word)
+            if wordlength > 0: # ignore blank lines
+                word = self.language.w_Tokens(word)[0]            
+                if minlength <= wordlength <= maxlength:                
+                    goodwords.append(word)
+                else:
+                    rejects.append(word)
 
         goodwords, rejects = self.sanitize_nosubwords(goodwords, rejects)
         goodwords = self.sanitize_sortbysize(goodwords)
@@ -637,8 +670,7 @@ class WSformats():
                 htmlmatrix += cellvalue + " " 
             htmlmatrix += "</p>\n"
         return htmlmatrix
-    def html_article(self, article, accepted, lingua = "to"):
-        wstext = WStext(lingua)
+    def html_article(self, article, accepted, wstext):
         htmlarticle = ""
         highlighted_words = []
         for line in article:
@@ -647,7 +679,7 @@ class WSformats():
             #    line = line.replace(k,v)
             
             for article_word in line.split():
-                sanitised_word = wstext.language.w_Tokens(article_word)[0]
+                sanitised_word = wstext.language.w_Tokens(wstext.language.lowercase(article_word))[0]
                 restofword = ""
                 if len(sanitised_word) > len(article_word):
                     restofword = article_word[len(sanitised_word):]
@@ -655,7 +687,7 @@ class WSformats():
                     if accword == sanitised_word:
                         if not accword in highlighted_words:
                             highlighted_words.append(accword)
-                            htmlarticle += "<b><i>" + article_word + "</i></b>" + restofword + " "
+                            htmlarticle += "<span class='highlight'>" + article_word + "</span>" + restofword + " "
                         else:
                             htmlarticle += article_word + restofword + " "                            
                         break 

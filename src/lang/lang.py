@@ -77,10 +77,7 @@ class Language:
     
     def w_validFirst( self, letter):
         return True # Any unique rules for first characters in a word?
-    def w_Tokens(self, line = None):
-        if line is None:
-            line = self.list_words
-        
+    def w_Tokens(self, line = u""):
         iTokenStart = 0
         iPrev = 0
         iCurr = 0

@@ -3,7 +3,7 @@
 """
 
     :copyright: (c) 2009, Samiuela Loni Vea Taufa
-    :license: MIT, see LICENSE.txt for more details
+    :license: ISCL, see LICENSE.txt for more details
 """
 # code below derived in part or whole from:
 # http://ginstrom.com/scribbles/2008/03/08/using-chardet-to-convert-arbitrary-byte-strings-to-unicode/

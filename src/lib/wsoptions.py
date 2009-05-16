@@ -3,7 +3,7 @@
 """
 
     :copyright: (c) 2009, Samiuela Loni Vea Taufa
-    :license: MIT, see LICENSE.txt for more details
+    :license: ISCL, see LICENSE.txt for more details
 """
 import optparse, sys
 
@@ -21,6 +21,7 @@ class WSoptions:
         self.article = False
         self.minimumwordlength = 0
         self.set_options()
+        self.lingua = "en"
         
     def read_options_default(self):
         pass # Get it from a file?
@@ -65,6 +66,10 @@ class WSoptions:
             255 = All Directions
             '''
          )
+        self.parser.add_option('-t','--text', action='store',type='string', nargs=1,
+                               dest='lingua',help='Specify the character set are the input text in',
+                               default='en')
+        
         self.parser.add_option('-l', '--level', action='store', type='int', dest='level',
                               help='''Level of Difficulty [1-5]. A simplified amalgamation of directions.
             Level 1 (Basic [9]- default) Left to Right and Down,
@@ -80,9 +85,6 @@ class WSoptions:
         if options.grid_size is not None:
             self.rows = options.grid_size[0]
             self.cols = options.grid_size[1]
-        
-        if options.directions is not None:
-            self.directions = options.directions
             
         if options.format is not None:
             self.format = options.format
@@ -102,10 +104,14 @@ class WSoptions:
                 self.directions = 143
             elif level == 4:
                 self.directions = 175
+                
+        if options.directions is not None:
+            self.directions = options.directions
             
         self.minimumwordlength = options.minimumwordlength
         self.article = options.article
         self.outputpath = options.outputpath
+        self.lingua = options.lingua
         
     def get_cmdline(self):
         self.read_cmdline()

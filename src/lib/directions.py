@@ -20,6 +20,30 @@ class Directions:
                            self.DiagDwnLeft, self.DiagDwnRight]
         self.Chosen = []
     
+    def __str__(self):
+        vd = [] # valid directions
+        if self.Right in self.Directions:
+            vd.append("Left to Right")
+        if self.Left in self.Directions:
+            vd.append("Right to Left")
+        if self.Up in self.Directions:
+            vd.append("Up")
+        if self.Down in self.Directions:
+            vd.append("Left to Down")
+        if self.DiagUpLeft in self.Directions:
+            vd.append("Diagonal Up Right to Left")
+        if self.DiagUpRight in self.Directions:
+            vd.append("Diagonal Up Left to Right")
+        if self.DiagDwnLeft in self.Directions:
+            vd.append("Diagonal Down Right to Left")
+        if self.DiagDwnRight in self.Directions:
+            vd.append("Diagonal Down Left to Right")
+        
+        vdirections = ""
+        for dir in vd:
+            vdirections += "%s, " % dir
+        
+        return vdirections[:-2]
     def set_directions(self, combined):
         for i in range(0, len(self.Directions)):
             if combined & self.Directions[i]:
