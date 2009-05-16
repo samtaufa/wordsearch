@@ -1,0 +1,80 @@
+
+NAME
+    wordsearch.py - generate word search (word find) puzzles
+    
+SYNOPSIS
+
+    wordsearch.py [ option ] [ pathname ]
+
+DESCRIPTION
+
+    Word search puzzles are pen and paper puzzles containing a grid of letters. The player's task is to locate words hidden within this grid. Each word is in a straight line, but can be placed in any direction, horizontally (left to right, or right to left), vertically (upwards or downwards), or diagonally. Just to make the puzzle that little bit more difficult, words may overlap orintersect, and of course not every letter in the grid is actually part of a word. 
+    
+Mandatory arguments for long options are mandatory for short options too
+    
+I tried to make the command-line help screen (wordsearch.py --help) legible, but there's a formatting problem.
+
+OPTIONS
+
+    The options may be given in any order, before or after pathname.
+    
+--article
+    
+    Only useful with --format=html.
+    
+    Reprints the content of pathname with the words placed in the puzzle _highlighted_
+    
+-g GRID_SIZE, --gridsize=GRID_SIZE
+
+    GRID_SIZE is the row and column size for the puzzle. For example:
+    
+    --gridsize=10 11
+
+-o OUTPUTPATH, --outputpath=OUTPUTPATH
+
+    If not specified, the program output is sent to the screen.
+    
+    Use the output path if your puzzle uses non-ascii characters.
+
+-f FORMAT, --format=FORMAT
+
+    FORMAT specifies [ html | unicode | xml ] the output format of the generated puzzle. For example
+    
+    --format=html
+    
+    The default is 'unicode'
+    
+-m MINIMUMWORDLENGTH, --minimumwordlength=MINIMUMWORDLENGTH
+
+    The minimum length of a word to be included in the puzzle.
+
+-d DIRECTIONS, --directions=DIRECTIONS
+
+    Set the directions words are placed in the puzzle. Adding the value of the directions together gives the combination of directions.
+    
+    DIRECTIONS    [1|2|4|8|16|32|64|128].
+        1.  Left to Right
+        2.  Right to Left
+        4.  Up
+        8.  Down
+        16. Diagonal Up to Left
+        32. Diagonal Up to Right
+        64. Diagonal Down to Left
+        128.Diagonal Down to Right
+        
+        For example, the following values give the set direction combinations:
+        
+        9   Right[1] + Down[8] (default);
+        11  Right[1] + Left[2] + Down[8];
+        143 Right[1] + Left[2] + Down[8] + Up[4] + DiagDwnRight[128];
+        255 All Directions
+
+-l LEVEL, --level=LEVEL
+
+    Level of Difficulty [1-5]. A simplified amalgamation of directions.
+    
+            Level 1 [9]  (Basic - default) Left to Right and Down,
+            Level 2 [137](Sweet) Right, Down, DiagDwnRight
+            Level 3 [143](Challenger) Right, Left, Down, Up, DiagDwnRight
+            Level 4 [175](Try Me) Right, Left, Down, Up, DiagDwnRight, DiagUpRight
+            Level 5 [255](All Out) All Directions

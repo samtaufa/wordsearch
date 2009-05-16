@@ -1,0 +1,73 @@
+"""
+
+    lang.to.py - More Information
+    
+    Language notes for the "to" Lea Faka-Tonga (Tongan Language)
+    
+"""
+
+The purpose of the lang.to.py module is to facilitate transforming
+text that includes characters not in the "to" Tongan alphabet.
+[Useful: Reference to UTF language character set.]
+
+Notable non-ascii characters, with *significant* implications in the
+language include vowels with Macrons and the Glottal.
+
+Tongan Language users regularly converse in multiple lingua, both
+regional and multinational. To facilitate this general phenomena
+we explicitly include the full ascii character set whereas they
+are not all part of the defined alphabet.
+
+What is a word.
+
+Without reference to a dictionary (is that another
+project beckoning?) We attempt here to algorithmically define what
+are legitimate constructs to what may legitimately be a word.
+
+This program will attempt to read text (not just single word perline
+entries) and surmise from there what might be legitimate language
+words for the puzzle generation.
+
+    Word Boundaries:
+    
+    Word boundaries are where the algorithm determines the letter
+    or character is not part of the acceptable letters in a word.
+    
+    For example, "plaxton:" , 'plaxton' are letters in the accepted
+    alphabet, but ":" (colon) is not part of a legitimate word
+    and when encountered will determine a 'word-boundary'
+
+    Glottals:
+    
+    Glottals (fakau'a) is an explicit character of the Tongan Language
+    Alphabet. In writing it precedes vowels, either at the beginning
+    or middle of a word.
+    
+    Single quotes are transposed as glottals and therefore either
+    follows the above definition of use or is deemed as a word boundary
+    
+    exist before vowels
+    (at the beginning, inside, at the end)
+
+(at the beginning, inside) Glottal's are legal within words as accentuations, and are more commonly written with the standard single quote.
+
+This makes it difficult (without an existing dictionary) to ascertain which are parts of a word, as opposed to being layout for quotations.
+
+Sample words with glottal marks include:
+
+    'Otua
+    fakau'a
+    fe'ao
+    'Ene'io
+    
+A simplified rule is to retain all uses of single-quotes bounded by legitimate characters. Glottals at the beginning of a word will need to be verified with a dictionary
+
+(at the end) Observations of using Glottal's at the end of a word are either closing of a quotation, or another form of notation to determine the preceeding vowel needs to be accentuated.
+
+WordBreaker
+
+* User a supporting class, WordBreaker:
+
+  > Takes a line of text
+  > strips based on punctuation marks (except glottal/single quotes)
+  > remove glottal/single quotes at end of word

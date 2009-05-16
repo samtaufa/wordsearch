@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+"""
+
+Unicode support is a strange beast in Python (not knowing how well it
+is supported in other 'programming' languages.
+
+1. Python Configuration.
+
+Python usually converts unicode to ASCII whenever it needs to make a
+regular string out of a unicode string? 
+
+The default encoding scheme for Python source code is an option which
+you can customize in the file sitecustomize.py, or in later versions
+as an entry such as the 
+
+# -*- coding: encoding -*- 
+
+shown above or in the source code.
+
+sitecustomize.py is normally found in the ${pythondir}/lib/site-packages
+and contains at least the lines:
+
+import sys
+sys.setdefaultencoding('utf-8') 
+
+2. Unicode and Text File encoding.
+
+Make sure you tell your Text/Word Editor to save files as 'Unicode UTF-8'
+
+As far as I have experienced, text files are not normally encoded in Unicode.
+Computer Systems generally work with text in either a 'locale' setting or
+'codepage' and this is used by applications to write out text on the screen
+and disk.
+
+For example, if you are running Microsoft Windows as your OS with the English
+Language, your code page may be Western European (codepage ISO-8859-2, Latin-1).
+Unfortunately, that codepage doesn't support Microsoft Word's 'smart-quotes'
+but the smart-quotes are reachable from codepage '1252' but other characters
+may not match correctly. (Word's smartquotes comes out as \x91 and \x92 in codepage ISO-8859-2
+whch isn't mapped to anything.)
+
+hLoading a file produced in this way will have unpredictable
+results
+
+and as such support for Non-Ascii characters is managed through the use of
+BeautifulSoup to try and ascertain the character encoding of files.
+
+Further complication is that Microsoft Word smart quotes are not interpreted
+correctly using BeautifulSoup's estimate, and since that's my primary editor
+for generating 'accented' characters, I've hard-coded the code page / character
+encoding ('cp1252') that accurately reflects the smart quotes for decoding into
+unicode.
+"""

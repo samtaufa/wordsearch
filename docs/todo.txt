@@ -1,0 +1,7 @@
+TODO
+
+htmlentitydefs.codepoint2name
+    a dictionary that maps Unicode codepoints to HTML entity names
+    
+    It doesn't seem like the full (or at least the few that I
+    want to use) unicode is representable in html?
