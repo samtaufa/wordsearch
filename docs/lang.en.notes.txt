@@ -1,0 +1,13 @@
+"""
+
+    lang.e.py - More Information
+    
+    Language notes for the "en" English Text
+    
+"""
+
+Premise:
+
+Use US ASCII as the text foundation.
+
+Support transforming MS Word smart-quotes to apostrophe where appropriate.
