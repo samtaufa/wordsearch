@@ -67,7 +67,7 @@ class WSoptions:
             '''
          )
         self.parser.add_option('-t','--text', action='store',type='string', nargs=1,
-                               dest='lingua',help='Specify the character set are the input text in',
+                               dest='lingua',help='Specify the input text character set rules',
                                default='en')
         
         self.parser.add_option('-l', '--level', action='store', type='int', dest='level',
