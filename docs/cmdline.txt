@@ -78,3 +78,7 @@ OPTIONS
             Level 3 [143](Challenger) Right, Left, Down, Up, DiagDwnRight
             Level 4 [175](Try Me) Right, Left, Down, Up, DiagDwnRight, DiagUpRight
             Level 5 [255](All Out) All Directions
+
+-t LINGUA, --text=LINGUa
+
+    
