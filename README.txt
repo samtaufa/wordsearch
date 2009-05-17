@@ -10,8 +10,27 @@ Unicode Support:    "ÁÂÃÄÉÊËÍÎÏÓÔÕÖÚÛÜáâãäéêëíîïóô�
 6. Why bother ?
    . Self Education / Fun
    . Unicode
+7. I don't like this
 
 1. What is this
+
+        $ ./src/wordsearch.py ./docs/examples/wordlist.1.txt --gridsize 8 15
+        
+        Find words hidden: Left to Right
+        
+                u p h e r e a l l o o k t o h
+                t a n d o h a v e f o r c a r
+                b o y n d a d o g e t y o u a
+                r g i r l i n o i s l i k e m
+                w i l l m o t h e r s s e e o
+                e w c a n h a d b i g g o o d
+                r a t w e n t c o m e a m a o
+                i g o t b h o m e i t s a i d
+
+        all, am, and, at, big, boy, can, car, come, dad, do, for, get, girl, good, got,
+        had, have, here, home, in, is, it, like, look, mother, no, said, see, to, up, we
+        nt, will, you
+        34 words (16 of 120 cells spot filled [13%])
 
 wordsearch.py generates 'wordsearch' or 'word find' printable paper puzzles,
 containing words in a grid.
@@ -69,7 +88,81 @@ help reaffirm sight word skills for the children.
     Coding:
        * pry http://dev.nullcube.com for unit testing
        
-5. Why bother ?
+5. What are the features
+
+    Other than the standard fare for wordsearch puzzle generators,
+    an interesting functional feature of this rendition is 
+    
+    --article
+    
+    when combined with html output.
+    
+    If you generate a puzzle from paragraphs of text, then using
+    --article and --format html will display the original text
+    paragraph, with the hidden words 'highlighted'
+    
+    
+    $ ./src/wordsearch.py ./docs/examples/paragraphs.1.txt --gridsize 8 15 --article --format html
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=        UTF-8" />
+        <title>Wordsearch Puzzle Generation</title>
+    </head>
+    <body>
+        <p class='title'>Title: Word Search Puzzle</p>
+        <p class='subtitle'>Sub-Title</p>
+        <p class='directions'>Find words hidden: Left to Right</p>
+        <div class='ws-puzzle'>
+            <p class='ws-puzzle'>p e n p r i n t a b l e a c h </p>
+            <p class='ws-puzzle'>a v e r t i c a l l y g r i d </p>
+            <p class='ws-puzzle'>r i g h t g e n e r a t e s r </p>
+            <p class='ws-puzzle'>o f i n d i r e c t i o n o t </p>
+            <p class='ws-puzzle'>p y c o n t a i n i n g a r e </p>
+            <p class='ws-puzzle'>d w o r d s e a r c h t a s k </p>
+            <p class='ws-puzzle'>d i a g o n a l l y p a p e r </p>
+            <p class='ws-puzzle'>i h o r i z o n t a l l y b e </p>
+
+        </div>
+        <div class='ws-wordlist'>
+            <p class='ws-wordlist'>
+             are, be, containing, diagonally, direction, each, find, generates, grid, horizo
+            ntally, not, of, paper, pen, printable, py, right, task, vertically, wordsearch
+            </p>
+        </div>
+        <div class='ws-article'>
+            <p class='ws-article'><span class='highlight'>´╗┐wordsearch.py</span> <span clas
+            s='highlight'>generates</span> 'wordsearch' or 'word <span class='highlight'>fin
+            d'</span> <span class='highlight'>printable</span> <span class='highlight'>paper
+            </span> puzzles, <br />
+            <p class='ws-article'><span class='highlight'>containing</span> words in a <span
+             class='highlight'>grid.</span> <br />
+            <p class='ws-article'><br />
+            <p class='ws-article'>Word search puzzles <span class='highlight'>are</span> <sp
+            an class='highlight'>pen</span> and paper puzzles containing a grid <span class=
+            'highlight'>of</span> letters. <br />
+            <p class='ws-article'>The player's <span class='highlight'>task</span> is to loc
+            ate words hidden within this grid. <span class='highlight'>Each</span> word is <
+            br />
+            <p class='ws-article'>in a straight line, but can <span class='highlight'>be</sp
+            an> placed in any <span class='highlight'>direction,</span> <span class='highlig
+            ht'>horizontally</span> (left to <br />
+            <p class='ws-article'><span class='highlight'>right,</span> or right to left), <
+            span class='highlight'>vertically</span> (upwards or downwards), or <span class=
+            'highlight'>diagonally.</span> <br />
+            <p class='ws-article'>Just to make the puzzle that little bit more difficult, wo
+            rds may overlap or <br />
+            <p class='ws-article'>intersect, and of course <span class='highlight'>not</span
+            > every letter in the grid is actually part of a <br />
+            <p class='ws-article'>word. <br />
+        </div>
+        <p class='ws-stats'>20 words (4 of 120 cells spot filled [3%])</p>
+    </body>
+</html>
+
+    
+6. Why bother ?
 
   - Self Education / Fun
 
@@ -120,6 +213,12 @@ help reaffirm sight word skills for the children.
   without having substituted a "?" mark or square block instead of the
   letter/character, then you might like this tool.
   
-  
+7. I don't like this
+
+IF you're still interested in wordsearch puzzles, but hate my code,
+you might find more traction in other projects, possibly:
+
+  http://sourceforge.net/projects/findthatword/
+  http://wordsearchcreator.org/
 
   

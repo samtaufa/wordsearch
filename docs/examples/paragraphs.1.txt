@@ -1,0 +1,10 @@
+﻿wordsearch.py generates 'wordsearch' or 'word find' printable paper puzzles,
+containing words in a grid.
+
+Word search puzzles are pen and paper puzzles containing a grid of letters. 
+The player's task is to locate words hidden within this grid. Each word is 
+in a straight line, but can be placed in any direction, horizontally (left to 
+right, or right to left), vertically (upwards or downwards), or diagonally. 
+Just to make the puzzle that little bit more difficult, words may overlap or
+intersect, and of course not every letter in the grid is actually part of a
+word. 
