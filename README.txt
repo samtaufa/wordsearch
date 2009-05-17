@@ -218,7 +218,11 @@ help reaffirm sight word skills for the children.
 IF you're still interested in wordsearch puzzles, but hate my code,
 you might find more traction in other projects, possibly:
 
+  http://puzzlemaker.discoveryeducation.com/WordSearchSetupForm.asp
+  http://puzzlemaker.discoveryeducation.com/WordSearchWithMessageSetupForm.asp
   http://sourceforge.net/projects/findthatword/
   http://wordsearchcreator.org/
 
-  
+Other educational (?) puzzles, or puzzles that ...
+
+http://puzzlemaker.discoveryeducation.com/AdvMazeSetupForm.asp
