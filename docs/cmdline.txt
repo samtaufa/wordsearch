@@ -79,6 +79,11 @@ OPTIONS
             Level 4 [175](Try Me) Right, Left, Down, Up, DiagDwnRight, DiagUpRight
             Level 5 [255](All Out) All Directions
 
--t LINGUA, --text=LINGUa
+-t LINGUA, --text=LINGUA
 
+    Specify the input text character set rules.
     
+    Currently, "to" and "en" (default)
+    
+    Rules implemented include character conversion, glottal rules, valid word 
+    constructs, lowercase, uppercase.

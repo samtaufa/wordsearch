@@ -28,36 +28,30 @@ class WSoptions:
     
     def set_options(self):
         self.usage = """
-        usage: %prog [options] pathname
+        usage: %prog [options] filename
 
-        where pathname is the file containing words
-        for generating wordsearch puzzle(s).
-        The file lists a different word for each line
-        unless using the --article option where the
-        file contains an 'article' or 'story' from
-        which words are collected for the puzzle.
+        %prog generages wordsearch puzzles from text in filename
+        
+        filename is the file containing words for generating 
+        wordsearch puzzle(s). The file contains lines of words 
+        (whether one word per line or a paragraph of text.)
+        
+        --article used with output format 'html' (-f html)
+        retains the structure of the text in the file with output
+        highlighting words hidden in the puzzle.
         """
         self.version = "%prog " + self.version
         self.parser = optparse.OptionParser(usage=self.usage, version=self.version)
         self.parser.add_option('','--article',action='store_true', dest='article',
-                               help='The input file is an article',
+                               help='Retain input file format for highlighted article output.',
                                default=False)
-        self.parser.add_option('-g', '--gridsize', action='store', type='int', nargs=2,
-                               dest='grid_size', help='Two paramaters, the x and y size of ' + 
-                                    'the puzzle grid to be created. The default is 20 by 20')
-        self.parser.add_option('-o','--outputpath', action='store', type='string', nargs=1,
-                               dest='outputpath', help='Where to create the puzzle, must be '+
-                               'a directory if the pathname is a directory')
-        self.parser.add_option('-f','--format', action='store', type='string', nargs=1,
-                               dest='format', help='Output format: [html|unicode|xml]')
-        self.parser.add_option('-m','--minimumwordlength',action='store', type='int', nargs=1,
-                               dest='minimumwordlength', help='Minimum length of word for puzzle',
-                               default=2)
         self.parser.add_option('-d', '--directions', action='store', type='int', dest='directions',
-                                help='''Directions words can traverse puzzle.
-            [1|2|4|8|16|32|64|128].
-            ( Left to Right = 1, Right to Left = 2, Up = 4, Down = 8, Diag Up to Left = 16,
-            Diag Up to Right = 32, Diag Down to Left = 64, Diag Down to Right = 128)
+                                help='''Set the Directions words can traverse puzzle; one or 
+            a combination of the numbers  [1|2|4|8|16|32|64|128]. 
+            ( Left to Right = 1, Right to Left = 2, 
+            Up = 4, Down = 8, 
+            Diag Up to Left = 16, Diag Up to Right = 32, 
+            Diag Down to Left = 64, Diag Down to Right = 128)
             
             Combine directions such as:
             9 = Right[1] + Down[8] (default);
@@ -66,18 +60,31 @@ class WSoptions:
             255 = All Directions
             '''
          )
-        self.parser.add_option('-t','--text', action='store',type='string', nargs=1,
-                               dest='lingua',help='Specify the input text character set rules',
-                               default='en')
-        
+        self.parser.add_option('-f','--format', action='store', type='string', nargs=1,
+                               dest='format', help='Output format: [html|unicode|xml]')
+        self.parser.add_option('-g', '--gridsize', action='store', type='int', nargs=2,
+                               dest='grid_size', help='Two paramaters, the x and y size of ' + 
+                                    'the puzzle grid to be created. The default is 20 by 20')
         self.parser.add_option('-l', '--level', action='store', type='int', dest='level',
-                              help='''Level of Difficulty [1-5]. A simplified amalgamation of directions.
+                              help='''Set the Level of Difficulty [1-5]. A simplified amalgamation of directions.
             Level 1 (Basic [9]- default) Left to Right and Down,
             Level 2 (Sweet [137]) Right, Down, DiagDwnRight
             Level 3 (Challenger [143]) Right, Left, Down, Up, DiagDwnRight
             Level 4 (Try Me [175]) Right, Left, Down, Up, DiagDwnRight, DiagUpRight
             Level 5 (All Out [255]) All Directions
             ''')
+        self.parser.add_option('-m','--minimumwordlength',action='store', type='int', nargs=1,
+                               dest='minimumwordlength', help='Minimum length of word for puzzle',
+                               default=2)
+        self.parser.add_option('-o','--outputpath', action='store', type='string', nargs=1,
+                               dest='outputpath', help='Where to create the puzzle, must be '+
+                               'a directory if the pathname is a directory')
+        self.parser.add_option('-t','--text', action='store',type='string', nargs=1,
+                               dest='lingua',help="""Specify the input text character set rules:
+                               Currently "en" (default) and "to" are supported.
+                               """,
+                               default='en')
+        
     
     def read_cmdline(self):
         options, self.args = self.parser.parse_args()
