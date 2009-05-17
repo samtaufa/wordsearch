@@ -1,0 +1,55 @@
+﻿"""
+
+    lang.lang.py - More Information
+    
+    Notes for the Language Base Class
+    
+"""
+The ./lang routines are primarily bourne out of my need to get
+Tongan Language material working correctly. Some of the choices
+in the wordsearch.py routines that require 'language' attention
+include:
+
+   * lowercase
+   * non-ascii characters (unicode)
+   * what letters are legal in a word
+   * special characters
+
+Lowercase
+------------------------------
+
+I want my puzzles to use lowercase letters, but I want the freedom
+to enter the words in whatever case is appropriate for their input.
+
+The language utils need to be able to change case of text to lowercase.
+The python standard string library provides a .lower() and .upper() 
+function for string conversion. But there's no standard for non-ascii
+letters.
+
+Non-ascii characters (Unicode)
+------------------------------
+
+The real world uses letters beyond the ASCII character set. I want to
+use them where appropriate, and the language utils to manage the
+non-ascii characters.
+
+What words are legal in a word
+------------------------------
+
+What is a word ?
+
+We'll not try to define what are legal words, but try to define what
+are basic letter constructs legal for a word.
+
+No, we're not going into seriously linguistic things here (like
+'u' after 'q' in English.) Just basic stuff to keep the utils
+codeable.
+
+If you must, please add more functionality.
+
+Special Characters
+------------------------------
+
+Some languages (like Tongan/Hawai'ian) have special characters that
+not only derive different meanings but also have unique handling
+requirements.

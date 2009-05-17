@@ -9,7 +9,7 @@ Since I don't recall my original code, there's some further reading below to hel
     DiagUpLeft = 16 | DiagUpRight = 32 | 
     DiagDwnLeft = 64  | DiagDwnRight = 128 )
     
-Use of 8 bit representation for directions allows for bitwise mathematics for resolving direction. A bit of hard work up front for simplified (?) coding afterwards ?
+I originally used an 8 bit representation for directions allows for bitwise mathematics for resolving direction. I looked at using sets in C++ (enumerated type?), but this new code is in python using a list. Does it really simplify things or just increases code complexity. A bit of hard work up front for simplified (?) coding afterwards ?
 
 I guesstimate the bitwise choice should making developing a GUI front end much simpler (at least the direction choice mechanism.)
 
