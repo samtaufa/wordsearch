@@ -107,7 +107,7 @@ help reaffirm sight word skills for the children.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=        UTF-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>Wordsearch Puzzle Generation</title>
     </head>
     <body>
@@ -132,29 +132,39 @@ help reaffirm sight word skills for the children.
             </p>
         </div>
         <div class='ws-article'>
-            <p class='ws-article'><span class='highlight'>´╗┐wordsearch.py</span> <span clas
-            s='highlight'>generates</span> 'wordsearch' or 'word <span class='highlight'>fin
-            d'</span> <span class='highlight'>printable</span> <span class='highlight'>paper
-            </span> puzzles, <br />
-            <p class='ws-article'><span class='highlight'>containing</span> words in a <span
-             class='highlight'>grid.</span> <br />
+            <p class='ws-article'>
+                <span class='highlight'>´╗┐wordsearch.py</span> 
+                <span class='highlight'>generates</span> 'wordsearch' or 'word 
+                <span class='highlight'>find'</span> 
+                <span class='highlight'>printable</span> 
+                <span class='highlight'>paper</span> puzzles, <br />
+            <p class='ws-article'>
+                <span class='highlight'>containing</span> words in a 
+                <span class='highlight'>grid.</span> <br />
             <p class='ws-article'><br />
-            <p class='ws-article'>Word search puzzles <span class='highlight'>are</span> <sp
-            an class='highlight'>pen</span> and paper puzzles containing a grid <span class=
-            'highlight'>of</span> letters. <br />
-            <p class='ws-article'>The player's <span class='highlight'>task</span> is to loc
-            ate words hidden within this grid. <span class='highlight'>Each</span> word is <
-            br />
-            <p class='ws-article'>in a straight line, but can <span class='highlight'>be</sp
-            an> placed in any <span class='highlight'>direction,</span> <span class='highlig
-            ht'>horizontally</span> (left to <br />
-            <p class='ws-article'><span class='highlight'>right,</span> or right to left), <
-            span class='highlight'>vertically</span> (upwards or downwards), or <span class=
-            'highlight'>diagonally.</span> <br />
-            <p class='ws-article'>Just to make the puzzle that little bit more difficult, wo
-            rds may overlap or <br />
-            <p class='ws-article'>intersect, and of course <span class='highlight'>not</span
-            > every letter in the grid is actually part of a <br />
+            <p class='ws-article'>
+                Word search puzzles 
+                <span class='highlight'>are</span> 
+                <span class='highlight'>pen</span> and paper puzzles containing a grid 
+                <span class='highlight'>of</span> letters. <br />
+            <p class='ws-article'>
+                The player's <span class='highlight'>task</span> 
+                is to locate words hidden within this grid. 
+                <span class='highlight'>Each</span> word is <br />
+            <p class='ws-article'>
+                in a straight line, but can <span class='highlight'>
+                be</span> placed in any <span class='highlight'>direction,</span> 
+                <span class='highlight'>horizontally</span> (left to <br />
+            <p class='ws-article'>
+                <span class='highlight'>right,</span> or right to left), 
+                <span class='highlight'>vertically</span> (upwards or downwards), 
+                or <span class='highlight'>diagonally.</span> <br />
+            <p class='ws-article'>
+                Just to make the puzzle that little bit more difficult, 
+                words may overlap or <br />
+            <p class='ws-article'>
+                intersect, and of course <span class='highlight'>not</span> 
+                every letter in the grid is actually part of a <br />
             <p class='ws-article'>word. <br />
         </div>
         <p class='ws-stats'>20 words (4 of 120 cells spot filled [3%])</p>
