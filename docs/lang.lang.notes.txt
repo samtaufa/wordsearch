@@ -5,14 +5,14 @@
     Notes for the Language Base Class
     
 """
-The ./lang routines are primarily bourne out of my need to get
-Tongan Language material working correctly. Some of the choices
+The ./lang methods were bourne out of my need to deal with 
+Tongan Language material working correctly. Design(?) choices
 in the wordsearch.py routines that require 'language' attention
 include:
 
    * lowercase
    * non-ascii characters (unicode)
-   * what letters are legal in a word
+   * what's a word
    * special characters
 
 Lowercase
@@ -33,12 +33,17 @@ The real world uses letters beyond the ASCII character set. I want to
 use them where appropriate, and the language utils to manage the
 non-ascii characters.
 
-What words are legal in a word
+What's a word?
 ------------------------------
+
+Since we allow users to choose files that contain freeform text, as
+well as single words per line, we need a way to define what can are
+word boundaries etc.
 
 What is a word ?
 
-We'll not try to define what are legal words, but try to define what
+We'll not try to define what are legal words, (The Tongan Dictionary
+is another, yet to be born project.) but try to define what
 are basic letter constructs legal for a word.
 
 No, we're not going into seriously linguistic things here (like
