@@ -387,7 +387,6 @@ class to(Language):
             unicodedata.lookup('LATIN CAPITAL LETTER GLOTTAL STOP') : unicodedata.lookup('MODIFIER LETTER TURNED COMMA'),
             unicodedata.lookup('LEFT SINGLE QUOTATION MARK') : unicodedata.lookup('MODIFIER LETTER TURNED COMMA'),
             unicodedata.lookup('RIGHT SINGLE QUOTATION MARK') : unicodedata.lookup('MODIFIER LETTER TURNED COMMA')
-             
         }
     def c_transpose(self, text = []):
         """

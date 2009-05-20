@@ -89,7 +89,25 @@ class en(Language):
         )
     def initGlottals(self):
         self.apostrophe  = unicodedata.lookup('APOSTROPHE')
-    
+        self.glottals = (self.apostrophe +
+                             unicodedata.lookup('GRAVE ACCENT') +
+                             unicodedata.lookup('ACUTE ACCENT') +
+                             unicodedata.lookup('MODIFIER LETTER TURNED COMMA') +
+                             unicodedata.lookup('MODIFIER LETTER APOSTROPHE') +
+                             unicodedata.lookup('MODIFIER LETTER REVERSED COMMA') +
+                             unicodedata.lookup('MODIFIER LETTER ACUTE ACCENT') +
+                             unicodedata.lookup('MODIFIER LETTER GRAVE ACCENT') +
+                             unicodedata.lookup('COMBINING TURNED COMMA ABOVE') +
+                             unicodedata.lookup('COMBINING REVERSED COMMA ABOVE') +
+                             unicodedata.lookup('COMBINING COMMA ABOVE') +
+                             unicodedata.lookup('COMBINING COMMA ABOVE RIGHT') +
+                             unicodedata.lookup('COMBINING GRAVE TONE MARK') +
+                             unicodedata.lookup('COMBINING ACUTE TONE MARK') +
+                             unicodedata.lookup('LATIN LETTER GLOTTAL STOP') +
+                             unicodedata.lookup('LATIN CAPITAL LETTER GLOTTAL STOP') +
+                             unicodedata.lookup('LEFT SINGLE QUOTATION MARK') +
+                             unicodedata.lookup('RIGHT SINGLE QUOTATION MARK') 
+                             )    
     def initTranslators(self):
         self.toLowerDict = {
             unicodedata.lookup('LATIN CAPITAL LETTER A') : unicodedata.lookup('LATIN SMALL LETTER A') ,
@@ -152,13 +170,55 @@ class en(Language):
         }
         for k, v in zip(string.ascii_lowercase, string.ascii_uppercase):
             self.toUpperDict[k] = v
-        
+            
+        self.transposeDict = {
+                    unicodedata.lookup('GRAVE ACCENT') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('ACUTE ACCENT') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('MODIFIER LETTER TURNED COMMA') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('MODIFIER LETTER APOSTROPHE') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('MODIFIER LETTER REVERSED COMMA') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('MODIFIER LETTER ACUTE ACCENT') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('MODIFIER LETTER GRAVE ACCENT') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('COMBINING TURNED COMMA ABOVE') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('COMBINING REVERSED COMMA ABOVE') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('COMBINING COMMA ABOVE') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('COMBINING COMMA ABOVE RIGHT') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('COMBINING GRAVE TONE MARK') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('COMBINING ACUTE TONE MARK') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('LATIN LETTER GLOTTAL STOP') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('LATIN CAPITAL LETTER GLOTTAL STOP') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('LEFT SINGLE QUOTATION MARK') : unicodedata.lookup('APOSTROPHE'), 
+                    unicodedata.lookup('RIGHT SINGLE QUOTATION MARK') : unicodedata.lookup('APOSTROPHE')            
+        }
+            
     def c_transpose(self, text = []):
         """
             Transpose text in the list using the rules set up
             in transposeDict
         """
-        return text
+        """
+            Transpose text in the list using the rules set up
+            in transposeDict
+        """
+        isString = False
+        if type(text) == type(u""):
+            isString = True
+            text = [text]
+        elif type(text) == type(""):
+            isString = True
+            text = [unicode(text)]
+            
+        newtext = []
+        for i in range(len(text)):
+            line = text[i]
+            for k, v in self.transposeDict.iteritems():
+                line = line.replace(k,v)
+            newtext.append(line)
+        
+        if isString: return newtext[0]
+        
+        return newtext
+    
     def lowercase(self, text=""):
         """
             Convert text to lowercase
