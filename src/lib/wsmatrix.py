@@ -651,10 +651,9 @@ class WSformats():
         return mysolution
     
     def html_accepted(self, accepted = []):        
-        htmlaccepted = "<p class='ws-wordlist'>\n"
-        for word in accepted:
-            htmlaccepted += " " + word + ","
-        htmlaccepted = htmlaccepted[0:-1] + "</p>\n"
+        htmlaccepted = """<p class='ws-wordlist'>
+            %s 
+            </p>\n""" % ", ".join(accepted)
         return htmlaccepted
         
     def html_matrix(self, matrix = [], obfuscate = True):        
@@ -736,10 +735,7 @@ class WSformats():
         return mysolution
     
     def unicode_accepted(self, accepted = []):        
-        acceptedline = ""
-        for word in accepted:
-            acceptedline += word +", "
-        return acceptedline[0:len(acceptedline)-2]
+        return "%s" % ", ".join(accepted)
         
     def unicode_matrix(self, matrix = [], obfuscate = True):        
         rows = len(matrix)
