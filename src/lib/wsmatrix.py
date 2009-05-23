@@ -624,14 +624,10 @@ class WSformats():
         
         accepted.sort()
         self.fillLetterBin()
-        myaccepted = self.html_accepted(accepted)
-        mymatrix = self.html_matrix(matrix)
-        mysolution = self.html_solution(matrix, accepted, solution)
+        self.acceptedFormatted = self.html_accepted(accepted)
+        self.matrixFormatted = self.html_matrix(matrix)
+        self.solutionFormatted = self.html_solution(matrix, accepted, solution)
 
-        self.acceptedFormatted = myaccepted
-        self.matrixFormatted = mymatrix
-        self.solutionFormatted = mysolution
-    
     def html_solution(self, matrix, accepted, solution):
         
         keys = solution.keys()
@@ -710,14 +706,10 @@ class WSformats():
 
         accepted.sort()
         self.fillLetterBin()
-        myaccepted = self.unicode_accepted(accepted)
-        mymatrix = self.unicode_matrix(matrix)
-        mysolution = self.unicode_solution(matrix, accepted, solution)
+        self.acceptedFormatted = self.unicode_accepted(accepted)
+        self.matrixFormatted = self.unicode_matrix(matrix)
+        self.solutionFormatted = self.unicode_solution(matrix, accepted, solution)
 
-        self.acceptedFormatted = myaccepted
-        self.matrixFormatted = mymatrix
-        self.solutionFormatted = mysolution
-    
     def unicode_solution(self, matrix, accepted, solution):
         keys = solution.keys()
         keys.sort()
