@@ -411,14 +411,7 @@ class WSdirections():
         if self.DiagDwnRight in self.Chosen:
             vd.append("Diagonal Down Left to Right")
         
-        vdirections = ""
-        for dir in vd:
-            vdirections += "%s, " % dir
-        
-        if vdirections:
-            vdirections = vdirections[:-2]
-            
-        return vdirections
+        return ", ".join(vd)
 
 class WStext():
     """
@@ -713,8 +706,7 @@ class WSformats():
     def unicode_solution(self, matrix, accepted, solution):
         keys = solution.keys()
         keys.sort()
-        mysolution =""
-        mysolution += "\nWord\tStart @\tDirection"
+        mysolution = "\nWord\tStart @\tDirection"
         for word in keys:
             if word in accepted:
                 mysolution += "\n  %s\t(%s,%s)\t%s" % (
