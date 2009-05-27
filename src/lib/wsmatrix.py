@@ -625,8 +625,7 @@ class WSformats():
         
         keys = solution.keys()
         keys.sort()
-        mysolution ="<p class='ws-solution'>"
-        mysolution += "\n"
+        mysolution ="<p class='ws-solution'>\n"
         for word in keys:
             if word in accepted:
                 mysolution += "  %s (%s,%s) %s<br />\n" % (
